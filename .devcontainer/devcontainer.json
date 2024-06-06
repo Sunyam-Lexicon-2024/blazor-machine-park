@@ -1,6 +1,6 @@
 {
-	"name": ".NET Development Starter",
-	"dockerComposeFile": "../docker-compose.yaml",
+	"name": "Blazor Machine Park",
+	"dockerComposeFile": "../development.docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
 	"shutdownAction": "stopCompose",
