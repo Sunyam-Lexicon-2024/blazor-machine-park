@@ -11,12 +11,20 @@
         <h2>
             Machine Park Manager
         </h2>
+
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        <MudPaper Elevation="25">
+            <MudToolBar>
+                <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+            </MudToolBar>
+        </MudPaper>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
             @Body
         </MudContainer>
     </MudMainContent>

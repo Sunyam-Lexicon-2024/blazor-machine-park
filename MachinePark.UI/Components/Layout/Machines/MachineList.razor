@@ -1,0 +1,20 @@
+<MudContainer Class="d-flex flex-column">
+    <div Class="mb-5">
+        <h3>Machines</h3>
+    </div>
+    <MudDataGrid Items="Machines">
+        <Columns>
+            <PropertyColumn Property="m => m.Id" />
+            <PropertyColumn Property="m => m.Name" />
+            <PropertyColumn Property="m => m.Active" />
+            <PropertyColumn Property="m => m.Section" />
+        </Columns>
+    </MudDataGrid>
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<Machine> Machines { get; set; } = [];
+
+}
