@@ -17,10 +17,10 @@
     <img src=".docs/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">.NET Containerized Development Enviroment</h3>
+<h3 align="center">Machine Park Manager</h3>
 
   <p align="center">
- Starter for local containerized .NET development 
+ A Machine Park Management system built on Blazor.
     <br />
     <a href="https://github.com/suny-am/dotnet-container-dev-env-starter"><strong>Explore the docs »</strong></a>
     <br />
