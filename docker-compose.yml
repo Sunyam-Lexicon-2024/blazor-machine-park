@@ -1,0 +1,29 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - BUILDKIT_INLINE_CACHE=0
+    user: vscode
+    volumes:
+      - .:/workspace
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "tail", "-f", "/dev/null" ]
+    networks:
+      - development
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_DATABASE: "DevelopmentDB"
+      MSSQL_SA_PASSWORD: "N&DevelopmentPassword"
+    networks:
+      - development
+
+networks:
+  development:
+    driver: bridge
