@@ -3,6 +3,8 @@ namespace MachinePark.API.Services;
 public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
+    Task<Machine?> AddAsync(Machine machine);
+    Task SaveChangesAsync();
 }
 public class MachineService(MachineParkDbContext machineParkDbContext) : IMachineService
 {
@@ -11,5 +13,16 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
     public async Task<IEnumerable<Machine>> GetAllMachinesAsync()
     {
         return await _machineParkDbContext.Machines.ToListAsync();
+    }
+
+    public async Task<Machine?> AddAsync(Machine machine)
+    {
+        var createdMachine = await _machineParkDbContext.Machines.AddAsync(machine);
+        return createdMachine.Entity;
+    }
+
+    public Task SaveChangesAsync()
+    {
+        throw new NotImplementedException();
     }
 }
