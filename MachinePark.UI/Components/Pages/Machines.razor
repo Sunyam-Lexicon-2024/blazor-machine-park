@@ -19,8 +19,8 @@
     {
         try
         {
-            _machines = await httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines")!;
-            @* _machineStats = await httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats"); *@
+            _machines = await httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
+            _machineStats = await httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
         }
         catch (Exception ex)
         {
