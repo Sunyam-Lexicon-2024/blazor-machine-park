@@ -1,6 +1,6 @@
-namespace MachinePark.UI.Entities;
+namespace MachinePark.Core.Models;
 
-public class Machine
+public class MachineModel
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;

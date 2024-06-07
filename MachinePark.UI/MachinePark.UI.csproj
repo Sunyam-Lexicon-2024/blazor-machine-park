@@ -9,6 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="6.20.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MachinePark.Core\MachinePark.Core.csproj" />
   </ItemGroup>
 
 </Project>
