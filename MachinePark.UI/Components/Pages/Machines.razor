@@ -8,19 +8,27 @@
 <MudContainer Class="d-flex">
     <MachineStatsDisplay Stats=_machineStats />
     <MachineDataGrid Machines=_machines />
+    @if (Layout is not null)
+    {
+        <MachineFormDisplay Mode=Layout.FormMode />
+    }
 </MudContainer>
 
 @code {
 
-    private IEnumerable<MachineModel> _machines = [];
+    [CascadingParameter] MainLayout Layout { get; set; }
+    private IEnumerable<MachineModel>? _machines = [];
     private MachineStatsModel? _machineStats = null;
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("LAYOUT" + Layout);
         try
         {
-            _machines = await httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
-            _machineStats = await httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+            _machines = await
+            httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
+            _machineStats = await
+            httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
         }
         catch (Exception ex)
         {

@@ -1,0 +1,33 @@
+<MudContainer>
+    <MudPaper Class="pa-4">
+
+        @if (Mode == FormMode.Add)
+        {
+            <MachineAddForm />
+        }
+        else if (Mode == FormMode.Edit)
+        {
+            <MudForm>
+                <MudField>Edit</MudField>
+            </MudForm>
+        }
+        else
+        {
+            <MudForm>
+                <MudField>Delete</MudField>
+            </MudForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public FormMode Mode { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("FORM OPEN");
+    }
+
+}

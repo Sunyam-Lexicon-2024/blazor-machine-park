@@ -1,0 +1,59 @@
+@using System.Text.RegularExpressions
+<MudForm Model="@model" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <h3>New Machine</h3>
+    <MudInputControl>
+        <MudTextField @bind-Value="@model.Name" T="string" Label="Name" Required="true"
+            RequiredError="A Machine name is required!" Validation="@(new Func<string, bool>(ValidName))" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudSlider @bind-Value="@model.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+            Wattage (@model.Wattage) kWh
+        </MudSlider>
+    </MudInputControl>
+    <MudInputControl>
+        <MudNumericField @bind-Value="@model.Section" T="int" Label="Section" Min="1" Max="100" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudCheckBox @bind-Value="@model.Online" T="bool" Label="Online" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>SubmitForm())">Submit</MudButton>
+    </MudInputControl>
+</MudForm>
+
+@code {
+    bool success;
+    string[] errors = { };
+    public MudForm form;
+
+    public double WattageDisplay { get; set; }
+
+    MachineModel model = new();
+
+    private bool ValidName(string name)
+    {
+        bool validName = true;
+        Regex pattern = new(@"[^A-Za-z0-9\-_]");
+
+        Match invalidPatternMatch = pattern.Match(name);
+
+        if (invalidPatternMatch.Success)
+        {
+            validName = false;
+        }
+        return validName;
+    }
+
+    public void SubmitForm()
+    {
+        form.Validate();
+
+        if (success)
+        {
+            Console.WriteLine(model.Name);
+            Console.WriteLine(model.Wattage);
+            Console.WriteLine(model.Section);
+            Console.WriteLine(model.Online);
+        }
+    }
+}

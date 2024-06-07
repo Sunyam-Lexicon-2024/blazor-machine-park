@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNameSpace>MachinePark.UI</RootNameSpace>
+    <RootNamespace>MachinePark.UI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,19 @@
+@inject HttpClient apiClient
+
+<MudToolBar Class="fixed">
+    <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="@(() => OpenForm(FormMode.Add))" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => OpenForm(FormMode.Edit))" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" OnClick="@(() => OpenForm(FormMode.Delete))" />
+</MudToolBar>
+
+@code {
+
+    [Parameter]
+    public EventCallback<FormMode> ToggleForm { get; set; }
+
+    private async Task OpenForm(FormMode mode)
+    {
+        await ToggleForm.InvokeAsync(mode);
+    }
+
+}
