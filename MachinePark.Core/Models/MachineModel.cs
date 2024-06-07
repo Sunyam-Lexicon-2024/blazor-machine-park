@@ -4,6 +4,7 @@ public class MachineModel
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
-    public bool Active { get; set; }
+    public bool Online { get; set; }
+    public double Wattage { get; set; }
     public int Section { get; set; }
 }

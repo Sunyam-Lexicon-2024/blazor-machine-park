@@ -1,6 +1,7 @@
 services:
 
   app:
+    container_name: machine-park
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,6 +17,7 @@ services:
       - development
 
   database:
+    container_name: machine-park-db
     image: "mcr.microsoft.com/mssql/server:2022-latest"
     environment:
       ACCEPT_EULA: "Y"
