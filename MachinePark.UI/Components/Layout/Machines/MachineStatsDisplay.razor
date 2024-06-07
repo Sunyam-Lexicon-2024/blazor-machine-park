@@ -1,21 +1,39 @@
-<MudCard>
-    <MudCardHeader>Machine Statistics</MudCardHeader>
-    @if(Stats is not null) 
-    {
-        <MudCardContent>@Stats.MachineCount</MudCardContent>
-        <MudCardContent>@Stats.OnlineCount</MudCardContent>
-        <MudCardContent>@Stats.OfflineCount</MudCardContent>
-        <MudCardContent>@Stats.TotalWattage</MudCardContent>
-        <MudCardContent>@Stats.LastUpdated</MudCardContent>
-    }
-    else {
-        <MudCardContent>No Data Available</MudCardContent>
-    }
-</MudCard>
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudCard>
+        <MudCardHeader>
+            <h2>Machine Stats</h2>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (Stats is not null)
+            {
+                <MudText class="ma-2"><strong>Machine Count</strong></MudText>
+                <MudText class="ma-2">@Stats.MachineCount</MudText>
+                <MudText class="ma-2"><strong>Online Count</strong></MudText>
+                <MudText class="ma-2">@Stats.OnlineCount</MudText>
+                <MudText class="ma-2"><strong>Offline Count</strong></MudText>
+                <MudText class="ma-2">@Stats.OfflineCount</MudText>
+                <MudText class="ma-2"><strong>Total Wattage (kWh)</strong></MudText>
+                <MudText class="ma-2">@Stats.TotalWattage</MudText>
+                <MudSpacer></MudSpacer>
+                <MudText class="ma-2"><strong>Last Updated Machine</strong></MudText>
+                <MudCardContent>
+                    <MudText class="ma-2"><strong>ID</strong></MudText>
+                    <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
+                    <MudText class="ma-2"><strong>Name</strong></MudText>
+                    <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
+                </MudCardContent>
+            }
+            else
+            {
+                <MudText>No Data Available</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
 @code {
 
     [Parameter]
-    public MachineStatsModel? Stats {get; set;}
+    public MachineStatsModel? Stats { get; set; }
 
 }
