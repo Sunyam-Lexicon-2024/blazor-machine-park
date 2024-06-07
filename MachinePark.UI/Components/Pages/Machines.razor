@@ -1,0 +1,27 @@
+@using System.Net.Http
+@inject HttpClient httpClient
+
+@page "/"
+
+<MudContainer Class="d-flex">
+    <MachineStats />
+    <MachineList Machines=_machines />
+</MudContainer>
+
+@code {
+
+    private IEnumerable<Machine>? _machines;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _machines = await httpClient.GetFromJsonAsync<IEnumerable<Machine>>("http://localhost:3001/api/machinesa");
+        }
+        catch
+        {
+            _machines = [];
+        }
+    }
+
+}

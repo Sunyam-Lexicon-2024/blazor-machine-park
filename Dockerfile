@@ -11,7 +11,7 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG TARGETARCH
 WORKDIR /source
 
-COPY *.csproj .
+COPY MachinePark.UI/*.csproj .
 RUN dotnet restore -a $TARGETARCH
 
 COPY . .
