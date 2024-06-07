@@ -239,11 +239,13 @@ gh pr create
 <p align="right"><a href="#readme-top">🔝</a></p>
 
 
+
 <!-- RESOURCES -->
 ## Resources
 
 - [MudBlazor Component Library](https://mudblazor.com/)
 
+<p align="right"><a href="#readme-top">🔝</a></p>
 
 
 <!-- LICENSE -->
