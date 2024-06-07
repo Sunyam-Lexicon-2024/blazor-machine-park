@@ -1,27 +1,30 @@
 @using System.Net.Http
+@using System.Text.Json
+
 @inject HttpClient httpClient
 
 @page "/"
 
 <MudContainer Class="d-flex">
-    <MachineStats />
-    <MachineList Machines=_machines />
+    <MachineStatsDisplay Stats=_machineStats />
+    <MachineDataGrid Machines=_machines />
 </MudContainer>
 
 @code {
 
-    private IEnumerable<Machine>? _machines;
+    private IEnumerable<MachineModel> _machines = [];
+    private MachineStatsModel? _machineStats = null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _machines = await httpClient.GetFromJsonAsync<IEnumerable<Machine>>("http://localhost:3001/api/machinesa");
+            _machines = await httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:3001/api/machines");
+            _machineStats = await httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:3001/api/machines/stats");
         }
-        catch
+        catch (Exception ex)
         {
-            _machines = [];
+            Log.Error("{Message}", new { Message = "Could not get data from API", Error = ex });
         }
     }
-
 }

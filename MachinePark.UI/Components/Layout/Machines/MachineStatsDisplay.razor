@@ -1,0 +1,21 @@
+<MudCard>
+    <MudCardHeader>Machine Statistics</MudCardHeader>
+    @if(Stats is not null) 
+    {
+        <MudCardContent>@Stats.MachineCount</MudCardContent>
+        <MudCardContent>@Stats.OnlineCount</MudCardContent>
+        <MudCardContent>@Stats.OfflineCount</MudCardContent>
+        <MudCardContent>@Stats.TotalWattage</MudCardContent>
+        <MudCardContent>@Stats.LastUpdated</MudCardContent>
+    }
+    else {
+        <MudCardContent>No Data Available</MudCardContent>
+    }
+</MudCard>
+
+@code {
+
+    [Parameter]
+    public MachineStatsModel? Stats {get; set;}
+
+}
