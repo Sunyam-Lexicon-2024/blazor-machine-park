@@ -16,10 +16,11 @@
     <img src=".docs/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Tournaments API</h3>
+<h3 align="center">Machine Park Manager</h3>
 
   <p align="center">
-    Tournaments API documentation
+ A Machine Park Management system built on Blazor.
+    
     <br />
     <a href="https://github.com/sunyam-lexicon-2024/blazor-machine-park"><strong>Explore the docs »</strong></a>
     <br />
