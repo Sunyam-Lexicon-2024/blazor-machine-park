@@ -12,10 +12,11 @@ ARG TARGETARCH
 WORKDIR /source
 
 COPY MachinePark.UI/*.csproj .
+COPY MachinePark.Core/*.csproj .
 RUN dotnet restore -a $TARGETARCH
 
 COPY . .
-RUN dotnet publish -c Release --no-restore -a $TARGETARCH -o /app
+RUN dotnet publish MachinePark.UI -c Release --no-restore -a $TARGETARCH -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS publish
 ENV DOTNET_ENVIRONMENT=Production
@@ -24,4 +25,4 @@ WORKDIR /app
 COPY --from=build /app .
 # Uncomment to enable non-root user
 # USER $APP_UID
-ENTRYPOINT ["dotnet", "Tournaments.API.dll"]
+ENTRYPOINT ["dotnet", "MachinePark.UI.dll"]
