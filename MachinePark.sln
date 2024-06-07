@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachinePark.UI", "MachinePark.UI\MachinePark.UI.csproj", "{FE61B9BA-3D71-4240-8CC6-B70A645BACBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachinePark.API", "MachinePark.API\MachinePark.API.csproj", "{F0AE8601-1CFD-4BC6-9104-4EF1BC1B4354}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachinePark.Data", "MachinePark.Data\MachinePark.Data.csproj", "{F975CE77-A6AD-402E-AAE9-FA300AA6590F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{FE61B9BA-3D71-4240-8CC6-B70A645BACBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE61B9BA-3D71-4240-8CC6-B70A645BACBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE61B9BA-3D71-4240-8CC6-B70A645BACBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0AE8601-1CFD-4BC6-9104-4EF1BC1B4354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0AE8601-1CFD-4BC6-9104-4EF1BC1B4354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0AE8601-1CFD-4BC6-9104-4EF1BC1B4354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0AE8601-1CFD-4BC6-9104-4EF1BC1B4354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F975CE77-A6AD-402E-AAE9-FA300AA6590F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F975CE77-A6AD-402E-AAE9-FA300AA6590F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F975CE77-A6AD-402E-AAE9-FA300AA6590F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F975CE77-A6AD-402E-AAE9-FA300AA6590F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -10,4 +10,8 @@
     <PackageReference Include="FastEndpoints" Version="5.26.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MachinePark.Core\MachinePark.Core.csproj" />
+  </ItemGroup>
+
 </Project>
