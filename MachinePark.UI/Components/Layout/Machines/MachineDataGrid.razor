@@ -48,7 +48,7 @@
             }
             else
             {
-                Log.Error(await response.Content.ReadAsStringAsync());
+                Log.Error("RESPONSE STATUS CODE: " + response.StatusCode.ToString());
             }
         }
         catch (Exception ex)
