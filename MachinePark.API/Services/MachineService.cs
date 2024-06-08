@@ -1,9 +1,15 @@
+using System.Linq.Expressions;
+
 namespace MachinePark.API.Services;
 
 public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
+    Task<Machine?> GetById(int machineId);
     Task<Machine?> AddAsync(Machine machine);
+    Task<Machine?> DeleteAsync(int machineId);
+
+    Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression);
     Task SaveChangesAsync();
 }
 public class MachineService(MachineParkDbContext machineParkDbContext) : IMachineService
@@ -15,10 +21,36 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return await _machineParkDbContext.Machines.ToListAsync();
     }
 
+    public async Task<Machine?> GetById(int machineId)
+    {
+        return await _machineParkDbContext.Machines.FirstOrDefaultAsync(m => m.Id == machineId);
+    }
+
     public async Task<Machine?> AddAsync(Machine machine)
     {
         var createdMachine = await _machineParkDbContext.Machines.AddAsync(machine);
         return createdMachine.Entity;
+    }
+    public async Task<Machine?> DeleteAsync(int machineId)
+    {
+        var machineToDelete = await GetById(machineId);
+        if (machineToDelete is null)
+        {
+            return null;
+        }
+        else
+        {
+            var deletedMachine = _machineParkDbContext.Machines.Remove(machineToDelete);
+            return deletedMachine.Entity;
+        }
+    }
+
+
+
+
+    public async Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression)
+    {
+        return await _machineParkDbContext.Machines.AnyAsync(expression);
     }
 
     public async Task SaveChangesAsync()
