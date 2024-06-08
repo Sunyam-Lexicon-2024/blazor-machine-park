@@ -7,6 +7,7 @@ public interface IMachineService
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
     Task<Machine?> GetById(int machineId);
     Task<Machine?> AddAsync(Machine machine);
+    Task<Machine?> UpdateAsync(Machine machine);
     Task<Machine?> DeleteAsync(int machineId);
 
     Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression);
@@ -28,9 +29,15 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
 
     public async Task<Machine?> AddAsync(Machine machine)
     {
-        var createdMachine = await _machineParkDbContext.Machines.AddAsync(machine);
-        return createdMachine.Entity;
+        var createdMachine = (await _machineParkDbContext.Machines.AddAsync(machine)).Entity;
+        return createdMachine;
     }
+    public async Task<Machine?> UpdateAsync(Machine machine)
+    {
+        var updatedMachine = await Task.Run(() => _machineParkDbContext.Machines.Update(machine).Entity);
+        return updatedMachine;
+    }
+
     public async Task<Machine?> DeleteAsync(int machineId)
     {
         var machineToDelete = await GetById(machineId);
