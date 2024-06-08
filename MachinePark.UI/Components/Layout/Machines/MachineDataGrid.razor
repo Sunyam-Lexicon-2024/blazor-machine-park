@@ -31,6 +31,8 @@
     public IEnumerable<MachineModel> Machines { get; set; } = [];
 
     [Parameter]
+    public EventCallback DataUpdate { get; set; }
+    [Parameter]
     public EventCallback<FormMode> FormModeChanged { get; set; }
     private async Task OnFormModeHasChanged(FormMode mode)
     {
@@ -44,7 +46,7 @@
             var response = await apiClient.DeleteAsync($"http://localhost:5000/api/machines/{model.Id}");
             if (response.IsSuccessStatusCode)
             {
-                Log.Information("Machine deleted"); // generate success here
+                await DataUpdate.InvokeAsync();
             }
             else
             {
