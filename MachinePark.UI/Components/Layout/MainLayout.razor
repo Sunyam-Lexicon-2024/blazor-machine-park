@@ -6,43 +6,28 @@
 
 <MudLayout>
     <MudAppBar>
+        <MudTooltip Text="Open Drawer" Delay="300" Duration="500"></MudTooltip>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
             OnClick="@(() => ToggleDrawer())" />
         <h2>
             Machine Park Manager
         </h2>
-
     </MudAppBar>
     <MudDrawer @bind-Open="@DrawerOpen">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudPaper Elevation="25">
-            <MachineToolBar ToggleForm=@ToggleForm />
-        </MudPaper>
         <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
-            <CascadingValue Value="this">
-                @Body
-            </CascadingValue>
+            @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 @code {
-
-    public FormMode FormMode { get; set; }
-    public bool FormOpen { get; set; } = false;
     public bool DrawerOpen { get; set; } = false;
 
     private void ToggleDrawer()
     {
         DrawerOpen = !DrawerOpen;
-    }
-
-    private void ToggleForm(FormMode mode)
-    {
-        FormMode = mode;
-        FormOpen = !FormOpen;
-        Console.WriteLine(mode);
     }
 }
