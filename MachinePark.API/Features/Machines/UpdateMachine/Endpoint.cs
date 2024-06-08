@@ -6,7 +6,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
     public IMachineService MachineService { get; set; }
     public override void Configure()
     {
-        Post("/machines/update-machine");
+        Put("/machines/update-machine");
         Description(d => d
             .Accepts<Request>("application/json")
             .Produces<Response>(200, "application/json")
