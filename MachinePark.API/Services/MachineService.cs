@@ -21,8 +21,8 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return createdMachine.Entity;
     }
 
-    public Task SaveChangesAsync()
+    public async Task SaveChangesAsync()
     {
-        throw new NotImplementedException();
+        await _machineParkDbContext.SaveChangesAsync();
     }
 }
