@@ -5,8 +5,9 @@ namespace MachinePark.API.Services;
 public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
-    Task<Machine?> GetById(int machineId);
+    Task<Machine?> GetByIdAsync(int machineId);
     Task<Machine?> AddAsync(Machine machine);
+    Task<Machine?> UpdateAsync(Machine machine);
     Task<Machine?> DeleteAsync(int machineId);
 
     Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression);
@@ -21,19 +22,25 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return await _machineParkDbContext.Machines.ToListAsync();
     }
 
-    public async Task<Machine?> GetById(int machineId)
+    public async Task<Machine?> GetByIdAsync(int machineId)
     {
         return await _machineParkDbContext.Machines.FirstOrDefaultAsync(m => m.Id == machineId);
     }
 
     public async Task<Machine?> AddAsync(Machine machine)
     {
-        var createdMachine = await _machineParkDbContext.Machines.AddAsync(machine);
-        return createdMachine.Entity;
+        var createdMachine = (await _machineParkDbContext.Machines.AddAsync(machine)).Entity;
+        return createdMachine;
     }
+    public async Task<Machine?> UpdateAsync(Machine machine)
+    {
+        var updatedMachine = await Task.Run(() => _machineParkDbContext.Machines.Update(machine).Entity);
+        return updatedMachine;
+    }
+
     public async Task<Machine?> DeleteAsync(int machineId)
     {
-        var machineToDelete = await GetById(machineId);
+        var machineToDelete = await GetByIdAsync(machineId);
         if (machineToDelete is null)
         {
             return null;

@@ -10,7 +10,9 @@ public class Mapper : ResponseMapper<MachineModel, Machine>
             Name = m.Name,
             Online = m.Online,
             Wattage = m.Wattage,
-            Section = m.Section
+            Section = m.Section,
+            CreatedAt = m.CreatedAt,
+            UpdatedAt = m.UpdatedAt
         };
     }
 }

@@ -1,7 +1,7 @@
 
 namespace Machines.AddMachine;
 
-public class Endpoint : Endpoint<Request, Response, Mapper>
+public class Endpoint : Endpoint<Request, Results<Ok<Response>, BadRequest>, Mapper>
 {
     public IMachineService MachineService { get; set; }
     public override void Configure()
@@ -10,17 +10,25 @@ public class Endpoint : Endpoint<Request, Response, Mapper>
         Description(d => d
             .Accepts<Request>("application/json")
             .Produces<Response>(200, "application/json")
+            .Produces(400)
             .ProducesProblemFE<InternalErrorResponse>(500),
         clearDefaults: true);
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task<Results<Ok<Response>, BadRequest>> HandleAsync(Request req, CancellationToken ct)
     {
-        Log.Information(req.Name);
         var machineToCreate = Map.ToEntity(req);
-        var createdMachine = await MachineService.AddAsync(machineToCreate);
-        await MachineService.SaveChangesAsync();
+        try
+        {
+            var createdMachine = await MachineService.AddAsync(machineToCreate);
+            await MachineService.SaveChangesAsync();
 
-        Response = Map.FromEntity(createdMachine!);
+            return TypedResults.Ok(Map.FromEntity(createdMachine!));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("{Message}", new { Message = "Internal error while updating machine model", Error = ex });
+            return TypedResults.BadRequest();
+        }
     }
 }

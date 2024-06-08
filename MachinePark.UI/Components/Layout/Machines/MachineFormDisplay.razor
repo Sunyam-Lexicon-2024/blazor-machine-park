@@ -1,4 +1,5 @@
-<MudContainer Class="fixed d-flex align-items-center" Style="height: 100vh; width: 100vw; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) ;">
+<MudContainer Class="fixed d-flex align-items-center" MaxWidth="MaxWidth.ExtraExtraLarge"
+    Style="height: 100vh; width: 100vw; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) ;">
     <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex" Style="align-items: center;">
         <MudPaper Class="pa-4" MaxHeight="500px" MInWidth="500px">
 
@@ -6,11 +7,9 @@
             {
                 <MachineAddForm FormClosed="@OnFormClosed" />
             }
-            else if (Mode == FormMode.Edit)
+            else if (Mode == FormMode.Edit && FormModel is not null)
             {
-                <MudForm>
-                    <MudField>Edit (TBD)</MudField>
-                </MudForm>
+                <MachineEditForm FormModel=FormModel FormClosed="@OnFormClosed" />
             }
         </MudPaper>
     </MudContainer>
@@ -18,6 +17,9 @@
 
 
 @code {
+
+    [Parameter]
+    public MachineModel? FormModel { get; set; } = null!;
 
     [Parameter]
     public FormMode Mode { get; set; }

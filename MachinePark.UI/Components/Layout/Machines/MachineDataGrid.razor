@@ -7,17 +7,27 @@
     <MudPaper Elevation="25">
         <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
     </MudPaper>
-    <MudDataGrid Items="@Machines">
+    <MudDataGrid Items="@Machines" Hover="true" ResizeMode="ResizeMode.Column" DragDropColumnReordering="true" >
         <Columns>
             <PropertyColumn Property="m => m.Id" />
             <PropertyColumn Property="m => m.Name" />
             <PropertyColumn Property="m => m.Online" />
             <PropertyColumn Property="m => m.Section" />
+            <PropertyColumn Property="m => m.CreatedAt" />
+            <PropertyColumn Property="m => m.UpdatedAt" />
             <TemplateColumn T="MachineModel">
                 <CellTemplate>
                     <MudTooltip Text="Delete Machine">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete machine"
                             OnClick="@(() => DeleteMachine(context.Item))" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="MachineModel">
+                <CellTemplate>
+                    <MudTooltip Text="Edit Machine">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit machine"
+                            OnClick="@(() => EditMachine(context.Item))" />
                     </MudTooltip>
                 </CellTemplate>
             </TemplateColumn>
@@ -33,10 +43,17 @@
     [Parameter]
     public EventCallback DataUpdate { get; set; }
     [Parameter]
+    public EventCallback<MachineModel> EditFormMode { get; set; }
+    [Parameter]
     public EventCallback<FormMode> FormModeChanged { get; set; }
     private async Task OnFormModeHasChanged(FormMode mode)
     {
         await FormModeChanged.InvokeAsync(mode);
+    }
+
+    private async Task EditMachine(MachineModel model)
+    {
+        await EditFormMode.InvokeAsync(model);
     }
 
     private async Task DeleteMachine(MachineModel model)

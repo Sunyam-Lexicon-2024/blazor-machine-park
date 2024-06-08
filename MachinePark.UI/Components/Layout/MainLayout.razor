@@ -17,13 +17,17 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-5">
             @Body
         </MudContainer>
     </MudMainContent>
+    <footer Class="fixed ma-2" Style="bottom: 0;">Design by <a href="https://github.com/suny-am">Suny-Am</a> - @year
+    </footer>
 </MudLayout>
 
 @code {
+
+    protected int year = DateTime.Today.Year;
     public bool DrawerOpen { get; set; } = false;
 
     private void ToggleDrawer()
