@@ -16,7 +16,14 @@ try
         app.UseDeveloperExceptionPage();
 
         app.UseDefaultExceptionHandler()
-           .UseFastEndpoints()
+           .UseFastEndpoints(configuration =>
+           {
+               configuration.Endpoints.RoutePrefix = "api";
+               configuration.Endpoints.Configurator = ep =>
+               {
+                   ep.AllowAnonymous(); // no auth for now
+               };
+           })
            .UseSwaggerGen();
 
         if (Environment.GetEnvironmentVariable("SEED_DATA") == "1")

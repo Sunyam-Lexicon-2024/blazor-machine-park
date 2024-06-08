@@ -1,5 +1,4 @@
 using MachinePark.Data.Seeds;
-using MachinePark.Data.Contexts;
 
 namespace MachinePark.API.Extensions;
 
@@ -31,13 +30,7 @@ public static class WebAppExtensions
     public static async Task SeedDataAsync(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
-        var logger = app.ApplicationServices.GetService<ILogger<Program>>();
-
-        if (logger is null)
-        {
-            throw new ArgumentException("Could not acquire Logger from Service Collection");
-        }
-
+        var logger = app.ApplicationServices.GetService<ILogger<Program>>() ?? throw new ArgumentException("Could not acquire Logger from Service Collection");
         var serviceProvider = scope.ServiceProvider;
         var machineParkDbContext = serviceProvider.GetRequiredService<MachineParkDbContext>();
 

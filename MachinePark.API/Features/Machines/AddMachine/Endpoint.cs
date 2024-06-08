@@ -6,8 +6,7 @@ public class Endpoint : Endpoint<Request, Response, Mapper>
     public IMachineService MachineService { get; set; }
     public override void Configure()
     {
-        Post("/api/machines/add-machine");
-        AllowAnonymous();
+        Post("/machines/add-machine");
         Description(d => d
             .Accepts<Request>("application/json")
             .Produces<Response>(200, "application/json")

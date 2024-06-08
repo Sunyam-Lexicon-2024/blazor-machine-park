@@ -1,4 +1,6 @@
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace Machines.DeleteMachine;
 
 public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadRequest>>
@@ -16,9 +18,12 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
                clearDefaults: true);
     }
 
-    public override async Task<Results<Ok<Response>, NotFound, BadRequest>> ExecuteAsync(Request req, CancellationToken ct)
+    public override async Task<Results<Ok<Response>, NotFound, BadRequest>> ExecuteAsync([FromRoute] Request req, CancellationToken ct)
     {
+        Log.Information("MACHINE ID: " + req.MachineId);
+
         bool machineExists = await MachineService.AnyAsync(m => m.Id == req.MachineId);
+
         if (machineExists)
         {
             Machine? deletedMachine = await MachineService.DeleteAsync(req.MachineId);

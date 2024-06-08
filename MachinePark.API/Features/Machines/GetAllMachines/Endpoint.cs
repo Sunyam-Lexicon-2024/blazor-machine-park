@@ -8,8 +8,7 @@ public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<IEnumerable<Mac
 
     public override void Configure()
     {
-        Get("/api/machines/get-all-machines");
-        AllowAnonymous();
+        Get("/machines/get-all-machines");
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)
