@@ -6,16 +6,19 @@
 <MudContainer Class="d-flex">
     <MachineStatsDisplay Stats=@MachineStats />
     <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())"
-        FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
+        FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"
+        EditFormMode="@((MachineModel model) => OnEditFormMode(model))" />
     @if (FormMode != FormMode.Closed)
     {
-        <MachineFormDisplay Mode=FormMode FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
+        <MachineFormDisplay FormModel=FormModel Mode=FormMode
+            FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
     }
 </MudContainer>
 
 @code {
-    public IEnumerable<MachineModel>? Machines {get; set;} 
-    public MachineStatsModel? MachineStats {get; set;} 
+    public IEnumerable<MachineModel>? Machines { get; set; }
+    public MachineStatsModel? MachineStats { get; set; }
+    public MachineModel? FormModel { get; set; } = null!;
     public static FormMode FormMode { get; set; } = FormMode.Closed;
 
     protected override async Task OnInitializedAsync()
@@ -28,8 +31,15 @@
         await FetchData();
     }
 
+    private async Task OnEditFormMode(MachineModel model)
+    {
+        FormModel = model;
+        FormMode = FormMode.Edit;
+    }
+
     private async Task OnFormModeChanged(FormMode mode)
     {
+
         FormMode = mode;
         await FetchData();
     }
