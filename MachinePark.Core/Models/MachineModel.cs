@@ -7,6 +7,6 @@ public class MachineModel
     public bool Online { get; set; }
     public double Wattage { get; set; }
     public int Section { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } 
     public DateTime? UpdatedAt { get; set; }
 }
