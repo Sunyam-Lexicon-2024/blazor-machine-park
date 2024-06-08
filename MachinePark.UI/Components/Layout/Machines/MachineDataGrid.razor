@@ -7,7 +7,7 @@
     <MudPaper Elevation="25">
         <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
     </MudPaper>
-    <MudDataGrid Items="@Machines">
+    <MudDataGrid Items="@Machines" Hover="true" ResizeMode="ResizeMode.Column" DragDropColumnReordering="true" >
         <Columns>
             <PropertyColumn Property="m => m.Id" />
             <PropertyColumn Property="m => m.Name" />

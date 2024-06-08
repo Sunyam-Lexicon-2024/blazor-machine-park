@@ -1,7 +1,8 @@
-<MudContainer MaxWidth="MaxWidth.Small">
+<MudContainer>
     <MudCard>
         <MudCardHeader>
-            <h2>Machine Stats</h2>
+            <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.DataExploration"></MudIcon>
+            <h3>Machine Stats</h3>
         </MudCardHeader>
         <MudCardContent>
             @if (Stats is not null)
@@ -14,11 +15,7 @@
                 <MudText class="ma-2">@Stats.OfflineCount</MudText>
                 <MudText class="ma-2"><strong>Total Wattage (kWh)</strong></MudText>
                 <MudText class="ma-2">@Stats.TotalWattage</MudText>
-                <MudText class="ma-2"><strong>Last Updated Machine</strong></MudText>
-                <MudText class="ma-2"><strong>ID</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
-                <MudText class="ma-2"><strong>Name</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
+
             }
             else
             {
@@ -26,6 +23,21 @@
             }
         </MudCardContent>
     </MudCard>
+    @if (Stats is not null)
+    {
+        <MudCard Class="mt-5">
+            <MudCardHeader>
+                <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Devices"></MudIcon>
+                <h3>Last Updated Machine</h3>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText class="ma-2"><strong>ID</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
+                <MudText class="ma-2"><strong>Name</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
+            </MudCardContent>
+        </MudCard>
+    }
 </MudContainer>
 
 @code {

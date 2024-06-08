@@ -76,7 +76,33 @@
 
         if (success)
         {
-            Console.WriteLine("SUCCESS");
+            try
+            {
+                using var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromMilliseconds(5000));
+
+                var response = await apiClient.PutAsJsonAsync("http://localhost:5000/api/machines/update-machine", FormModel,
+                cts.Token);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    requestFailure = "API not available; please try again later.";
+                }
+                else
+                {
+                    requestFailure = null;
+                    await FormClosed.InvokeAsync();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                requestFailure = "API not available; please try again later.";
+            }
+            catch (Exception ex)
+            {
+                requestFailure = "API not available; please try again later.";
+                Log.Error(ex.Message);
+            }
         }
     }
 }

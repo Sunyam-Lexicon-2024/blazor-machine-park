@@ -77,9 +77,10 @@
             try
             {
                 using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromMilliseconds(1000));
+                cts.CancelAfter(TimeSpan.FromMilliseconds(5000));
 
                 var response = await apiClient.PostAsJsonAsync("http://localhost:5000/api/machines/add-machine", model, cts.Token);
+                
                 if (!response.IsSuccessStatusCode)
                 {
                     requestFailure = "API not available; please try again later.";

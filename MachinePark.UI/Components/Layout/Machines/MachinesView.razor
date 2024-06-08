@@ -3,7 +3,7 @@
 
 @inject HttpClient httpClient
 
-<MudContainer Class="d-flex">
+<MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MachineStatsDisplay Stats=@MachineStats />
     <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())"
         FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"
