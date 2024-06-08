@@ -45,9 +45,6 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         }
     }
 
-
-
-
     public async Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression)
     {
         return await _machineParkDbContext.Machines.AnyAsync(expression);

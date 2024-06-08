@@ -1,24 +1,21 @@
 
-using Microsoft.AspNetCore.Mvc;
-
 namespace Machines.DeleteMachine;
 
 public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadRequest>>
 {
-    IMachineService MachineService { get; set; }
+    public IMachineService MachineService { get; set; }
     public override void Configure()
     {
-        Delete("/api/machines/{MachineId}");
-        AllowAnonymous();
+        Delete("/machines/{MachineId}");
         Description(d => d
-            .Accepts<Request>("application/json")
+            .Accepts<Request>()
             .Produces<Response>(200, "application/json")
             .Produces(404)
             .ProducesProblemFE<InternalErrorResponse>(500),
                clearDefaults: true);
     }
 
-    public override async Task<Results<Ok<Response>, NotFound, BadRequest>> ExecuteAsync([FromRoute] Request req, CancellationToken ct)
+    public override async Task<Results<Ok<Response>, NotFound, BadRequest>> ExecuteAsync(Request req, CancellationToken ct)
     {
         Log.Information("MACHINE ID: " + req.MachineId);
 
@@ -33,6 +30,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
             }
             else
             {
+                await MachineService.SaveChangesAsync();
                 return TypedResults.Ok<Response>(new() { MachineId = deletedMachine.Id });
             }
         }
