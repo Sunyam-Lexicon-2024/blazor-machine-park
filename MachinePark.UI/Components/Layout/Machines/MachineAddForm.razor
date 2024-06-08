@@ -1,0 +1,108 @@
+@using System.Text.RegularExpressions
+
+@inject HttpClient apiClient
+
+<MudForm Model="@model" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    <MudCardHeader Class="d-flex">
+        <h2>New Machine</h2>
+        <MudSpacer></MudSpacer>
+        <MudTooltip Text="Close form" Delay="500" Duration="800">
+            <MudIconButton Icon="@Icons.Material.Outlined.Close" OnClick="@CloseForm" />
+        </MudTooltip>
+    </MudCardHeader>
+    <MudInputControl>
+        <MudTextField @bind-Value="@model.Name" T="string" Label="Name" Required="true"
+            RequiredError="A Machine name is required!"
+            Validation="@(new Func<string, IEnumerable<string>>(ValidName))" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudSlider @bind-Value="@model.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+            Wattage (@model.Wattage) kWh
+        </MudSlider>
+    </MudInputControl>
+    <MudInputControl>
+        <MudNumericField @bind-Value="@model.Section" T="int" Label="Section" Min="1" Max="100" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudCheckBox @bind-Value="@model.Online" T="bool" Label="Online" />
+    </MudInputControl>
+    <MudInputControl>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SubmitForm">Submit</MudButton>
+    </MudInputControl>
+</MudForm>
+@if (requestFailure is not null)
+{
+
+    <MudText class="ma-3 pa-3" Color="@Color.Error">@requestFailure</MudText>
+
+}
+
+
+@code {
+    bool success;
+    string? requestFailure = null;
+    string[] errors = { };
+    private MudForm form;
+    private MachineModel model = new();
+
+    [Parameter]
+    public EventCallback FormClosed { get; set; }
+
+    // TBD Move validation to API?
+    private IEnumerable<string> ValidName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            yield return "A name is required!";
+            yield break;
+        }
+        Regex pattern = new(@"[^A-Za-z0-9\-_]");
+
+        Match invalidPatternMatch = pattern.Match(name);
+
+        if (invalidPatternMatch.Success)
+        {
+            yield return @"only alphanumeric characters and ""_"" as well as ""-"" are allowed!";
+        }
+
+    }
+
+    private async Task CloseForm()
+    {
+        await FormClosed.InvokeAsync();
+    }
+
+    private async Task SubmitForm()
+    {
+        await form.Validate();
+
+        if (success)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromMilliseconds(1000));
+
+                var response = await apiClient.PostAsJsonAsync("http://localhost:5000/api/machines/add-machine", model, cts.Token);
+                if (!response.IsSuccessStatusCode)
+                {
+                    requestFailure = "API not available; please try again later.";
+                }
+                else
+                {
+                    requestFailure = null;
+                    await FormClosed.InvokeAsync();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                requestFailure = "API not available; please try again later.";
+            }
+            catch (Exception ex)
+            {
+                requestFailure = "API not available; please try again later.";
+                Log.Error(ex.Message);
+            }
+        }
+    }
+}

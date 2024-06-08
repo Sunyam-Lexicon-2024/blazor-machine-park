@@ -6,3 +6,4 @@ global using Microsoft.EntityFrameworkCore;
 global using FastEndpoints;
 global using FastEndpoints.Swagger;
 global using Serilog;
+global using Microsoft.AspNetCore.Http.HttpResults;

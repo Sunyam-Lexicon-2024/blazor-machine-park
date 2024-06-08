@@ -1,6 +1,6 @@
 namespace Machines.Stats.GetMachineStats;
 
-public sealed class Endpoint : EndpointWithoutRequest<MachineStatsModel, Mapper>
+public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<MachineStatsModel>, NoContent>, Mapper>
 {
 
     public IMachineService MachineService { get; set; }
@@ -9,12 +9,24 @@ public sealed class Endpoint : EndpointWithoutRequest<MachineStatsModel, Mapper>
     {
         Get("/api/machines/stats/get-machine-stats");
         AllowAnonymous();
+        Description(d => d
+            .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
+            .Produces(204)
+            .ProducesProblemFE<InternalErrorResponse>(500),
+        clearDefaults: true);
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task<Results<Ok<MachineStatsModel>, NoContent>>
+    ExecuteAsync(CancellationToken ct)
     {
         var machines = await MachineService.GetAllMachinesAsync();
-        var model = Map.FromEntity(machines);
-        Response = model;
+        if (!machines.Any())
+        {
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.Ok(Map.FromEntity(machines));
+        }
     }
 }

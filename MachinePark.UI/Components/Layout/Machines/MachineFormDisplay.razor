@@ -1,0 +1,32 @@
+<MudContainer Class="fixed d-flex align-items-center" Style="height: 100vh; width: 100vw; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) ;">
+    <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex" Style="align-items: center;">
+        <MudPaper Class="pa-4" MaxHeight="500px" MInWidth="500px">
+
+            @if (Mode == FormMode.Add)
+            {
+                <MachineAddForm FormClosed="@OnFormClosed" />
+            }
+            else if (Mode == FormMode.Edit)
+            {
+                <MudForm>
+                    <MudField>Edit (TBD)</MudField>
+                </MudForm>
+            }
+        </MudPaper>
+    </MudContainer>
+</MudContainer>
+
+
+@code {
+
+    [Parameter]
+    public FormMode Mode { get; set; }
+
+    [Parameter]
+    public EventCallback<FormMode> FormModeChanged { get; set; }
+
+    private async Task OnFormClosed()
+    {
+        await FormModeChanged.InvokeAsync(FormMode.Closed);
+    }
+}

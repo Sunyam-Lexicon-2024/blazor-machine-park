@@ -1,0 +1,40 @@
+@using System.Net.Http
+@using System.Text.Json
+
+@inject HttpClient httpClient
+
+<MudContainer Class="d-flex">
+    <MachineStatsDisplay Stats=_machineStats />
+    <MachineDataGrid Machines=_machines FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
+    @if (FormMode != FormMode.Closed)
+    {
+        <MachineFormDisplay Mode=FormMode FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"/>
+    }
+</MudContainer>
+
+@code {
+    private IEnumerable<MachineModel>? _machines = [];
+    private MachineStatsModel? _machineStats = null;
+    public static FormMode FormMode { get; set; } = FormMode.Closed;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _machines = await
+            httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
+            _machineStats = await
+            httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("{Message}", new { Message = "Could not get data from API", Error = ex });
+        }
+    }
+
+    private void OnFormModeChanged(FormMode mode)
+    {
+        FormMode = mode;
+    }
+}

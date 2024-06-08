@@ -14,7 +14,10 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
-        app.UseFastEndpoints().UseSwaggerGen();
+
+        app.UseDefaultExceptionHandler()
+           .UseFastEndpoints()
+           .UseSwaggerGen();
 
         if (Environment.GetEnvironmentVariable("SEED_DATA") == "1")
         {
@@ -23,9 +26,9 @@ try
     }
     else
     {
-        app.UseFastEndpoints();
+        app.UseDefaultExceptionHandler()
+           .UseFastEndpoints();
     }
-
 
     app.Run();
     Log.Information("Application exited cleanly.");

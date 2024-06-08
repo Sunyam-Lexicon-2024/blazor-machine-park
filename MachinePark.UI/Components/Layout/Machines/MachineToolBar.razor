@@ -1,0 +1,21 @@
+@inject HttpClient apiClient
+
+
+<MudToolBar Class="pa-2">
+    <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="@(() => SetFormMode(FormMode.Add))" />
+    </MudTooltip>
+</MudToolBar>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback<FormMode> FormModeToggle { get; set; }
+
+    private async Task SetFormMode(FormMode mode)
+    {
+        MachinesView.FormMode = mode;
+        await FormModeToggle.InvokeAsync(mode);
+    }
+}

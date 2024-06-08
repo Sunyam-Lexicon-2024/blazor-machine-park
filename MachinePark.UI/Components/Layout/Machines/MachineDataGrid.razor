@@ -2,6 +2,9 @@
     <div Class="mb-5">
         <h2>Machines</h2>
     </div>
+    <MudPaper Elevation="25">
+        <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
+    </MudPaper>
     <MudDataGrid Items="Machines">
         <Columns>
             <PropertyColumn Property="m => m.Id" />
@@ -17,4 +20,10 @@
     [Parameter]
     public IEnumerable<MachineModel> Machines { get; set; } = [];
 
+    [Parameter]
+    public EventCallback<FormMode> FormModeChanged { get; set; }
+    private async Task OnFormModeHasChanged(FormMode mode)
+    {
+        await FormModeChanged.InvokeAsync(mode);
+    }
 }
