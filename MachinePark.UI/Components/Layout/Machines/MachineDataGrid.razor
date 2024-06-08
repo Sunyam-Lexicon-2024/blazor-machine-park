@@ -1,3 +1,5 @@
+@inject HttpClient apiClient
+
 <MudContainer Class="d-flex flex-column mt-5 mb-5">
     <div Class="mb-5">
         <h2>Machines</h2>
@@ -5,12 +7,20 @@
     <MudPaper Elevation="25">
         <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
     </MudPaper>
-    <MudDataGrid Items="Machines">
+    <MudDataGrid Items="@Machines">
         <Columns>
             <PropertyColumn Property="m => m.Id" />
             <PropertyColumn Property="m => m.Name" />
             <PropertyColumn Property="m => m.Online" />
             <PropertyColumn Property="m => m.Section" />
+            <TemplateColumn T="MachineModel">
+                <CellTemplate>
+                    <MudTooltip Text="Delete Machine">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"
+                            OnClick="@(() => DeleteMachine(context.Item))" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
         </Columns>
     </MudDataGrid>
 </MudContainer>
@@ -25,5 +35,25 @@
     private async Task OnFormModeHasChanged(FormMode mode)
     {
         await FormModeChanged.InvokeAsync(mode);
+    }
+
+    private async Task DeleteMachine(MachineModel model)
+    {
+        try
+        {
+            var response = await apiClient.DeleteAsync($"http://localhost:5000/api/machines/{model.Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                Log.Information("Machine deleted"); // generate success here
+            }
+            else
+            {
+                Log.Error(await response.Content.ReadAsStringAsync());
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+        }
     }
 }
