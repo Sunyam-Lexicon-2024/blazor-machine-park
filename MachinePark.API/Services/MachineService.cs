@@ -5,7 +5,7 @@ namespace MachinePark.API.Services;
 public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
-    Task<Machine?> GetById(int machineId);
+    Task<Machine?> GetByIdAsync(int machineId);
     Task<Machine?> AddAsync(Machine machine);
     Task<Machine?> UpdateAsync(Machine machine);
     Task<Machine?> DeleteAsync(int machineId);
@@ -22,7 +22,7 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return await _machineParkDbContext.Machines.ToListAsync();
     }
 
-    public async Task<Machine?> GetById(int machineId)
+    public async Task<Machine?> GetByIdAsync(int machineId)
     {
         return await _machineParkDbContext.Machines.FirstOrDefaultAsync(m => m.Id == machineId);
     }
