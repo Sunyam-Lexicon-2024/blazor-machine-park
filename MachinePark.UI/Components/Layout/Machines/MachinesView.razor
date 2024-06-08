@@ -4,37 +4,48 @@
 @inject HttpClient httpClient
 
 <MudContainer Class="d-flex">
-    <MachineStatsDisplay Stats=_machineStats />
-    <MachineDataGrid Machines=_machines FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
+    <MachineStatsDisplay Stats=@MachineStats />
+    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())"
+        FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
     @if (FormMode != FormMode.Closed)
     {
-        <MachineFormDisplay Mode=FormMode FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"/>
+        <MachineFormDisplay Mode=FormMode FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
     }
 </MudContainer>
 
 @code {
-    private IEnumerable<MachineModel>? _machines = [];
-    private MachineStatsModel? _machineStats = null;
+    public IEnumerable<MachineModel>? Machines {get; set;} 
+    public MachineStatsModel? MachineStats {get; set;} 
     public static FormMode FormMode { get; set; } = FormMode.Closed;
-
 
     protected override async Task OnInitializedAsync()
     {
+        await FetchData();
+    }
+
+    private async Task OnDataUpdate()
+    {
+        await FetchData();
+    }
+
+    private async Task OnFormModeChanged(FormMode mode)
+    {
+        FormMode = mode;
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
         try
         {
-            _machines = await
+            Machines = await
             httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
-            _machineStats = await
+            MachineStats = await
             httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
         }
         catch (Exception ex)
         {
             Log.Error("{Message}", new { Message = "Could not get data from API", Error = ex });
         }
-    }
-
-    private void OnFormModeChanged(FormMode mode)
-    {
-        FormMode = mode;
     }
 }

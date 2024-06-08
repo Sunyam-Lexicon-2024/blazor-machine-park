@@ -7,8 +7,7 @@ public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<MachineStatsMod
 
     public override void Configure()
     {
-        Get("/api/machines/stats/get-machine-stats");
-        AllowAnonymous();
+        Get("/machines/stats/get-machine-stats");
         Description(d => d
             .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
             .Produces(204)
