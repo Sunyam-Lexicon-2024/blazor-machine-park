@@ -40,7 +40,7 @@ public class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
 
     public async Task<Machine?> DeleteAsync(int machineId)
     {
-        var machineToDelete = await GetById(machineId);
+        var machineToDelete = await GetByIdAsync(machineId);
         if (machineToDelete is null)
         {
             return null;
