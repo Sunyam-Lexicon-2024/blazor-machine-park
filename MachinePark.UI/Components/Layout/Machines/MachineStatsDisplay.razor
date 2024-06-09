@@ -19,7 +19,14 @@
             }
             else
             {
-                <MudText>No Data Available</MudText>
+                if (ApiState == ApiState.Reachable)
+                {
+                    <MudText>No Data Available</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">API not available</MudText>
+                }
             }
         </MudCardContent>
     </MudCard>
@@ -38,9 +45,12 @@
             </MudCardContent>
         </MudCard>
     }
-</MudContainer>
+    </MudContainer>
 
-@code {
+    @code {
+
+    [Parameter]
+    public ApiState ApiState { get; set; }
 
     [Parameter]
     public MachineStatsModel? Stats { get; set; }

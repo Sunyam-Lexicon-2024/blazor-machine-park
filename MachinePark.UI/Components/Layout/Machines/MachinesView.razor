@@ -4,8 +4,8 @@
 @inject HttpClient httpClient
 
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
-    <MachineStatsDisplay Stats=@MachineStats />
-    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())"
+    <MachineStatsDisplay Stats=@MachineStats ApiState=@ApiState />
+    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())" ApiState=@ApiState
         FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"
         EditFormMode="@((MachineModel model) => OnEditFormMode(model))" />
     @if (FormMode != FormMode.Closed)
@@ -13,13 +13,15 @@
         <MachineFormDisplay FormModel=FormModel Mode=FormMode
             FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
     }
-</MudContainer>
+    </MudContainer>
 
-@code {
+    @code {
     public IEnumerable<MachineModel>? Machines { get; set; }
     public MachineStatsModel? MachineStats { get; set; }
     public MachineModel? FormModel { get; set; } = null!;
     public static FormMode FormMode { get; set; } = FormMode.Closed;
+
+    private ApiState ApiState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,7 +33,7 @@
         await FetchData();
     }
 
-    private async Task OnEditFormMode(MachineModel model)
+    private void OnEditFormMode(MachineModel model)
     {
         FormModel = model;
         FormMode = FormMode.Edit;
@@ -52,10 +54,12 @@
             httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
             MachineStats = await
             httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+            ApiState = ApiState.Reachable;
         }
         catch (Exception ex)
         {
             Log.Error("{Message}", new { Message = "Could not get data from API", Error = ex });
+            ApiState = ApiState.Unreachable;
         }
     }
 }

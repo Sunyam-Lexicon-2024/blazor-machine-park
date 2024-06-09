@@ -27,7 +27,7 @@
         <MudCheckBox @bind-Value="@model.Online" T="bool" Label="Online" />
     </MudInputControl>
     <MudInputControl>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SubmitForm">Create Machine</MudButton>
+        <MudButton Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Create Machine</MudButton>
     </MudInputControl>
 </MudForm>
 @if (requestFailure is not null)
