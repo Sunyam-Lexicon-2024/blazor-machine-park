@@ -1,4 +1,5 @@
-@inject HttpClient apiClient
+@inject HttpClient ApiClient
+@inject IDialogService DialogService
 
 <MudContainer Class="d-flex flex-column mb-5">
     <div Class="mb-5 d-flex align-center ">
@@ -8,7 +9,7 @@
     @if (ApiState == ApiState.Reachable)
     {
         <MudPaper Elevation="25">
-            <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
+            <MachineToolBar />
         </MudPaper>
         <MudDataGrid Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true"
             RowsPerPage="10">
@@ -44,12 +45,12 @@
     else
     {
         <MudPaper Class="d-flex justify-center align-center pa-2">
-            <MudText Color="@Color.Error">API not available</MudText>
+            <MudAlert Severity="Severity.Error">API not available</MudAlert>
         </MudPaper>
     }
-    </MudContainer>
+</MudContainer>
 
-    @code {
+@code {
 
     [Parameter]
     public IEnumerable<MachineModel> Machines { get; set; } = [];
@@ -59,25 +60,19 @@
 
     [Parameter]
     public EventCallback DataUpdate { get; set; }
-    [Parameter]
-    public EventCallback<MachineModel> EditFormMode { get; set; }
-    [Parameter]
-    public EventCallback<FormMode> FormModeChanged { get; set; }
-    private async Task OnFormModeHasChanged(FormMode mode)
-    {
-        await FormModeChanged.InvokeAsync(mode);
-    }
 
     private async Task EditMachine(MachineModel model)
     {
-        await EditFormMode.InvokeAsync(model);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model } };
+        DialogService.Show<EditMachineDialog>("Edit Machine", parameters);
     }
 
     private async Task DeleteMachine(MachineModel model)
     {
         try
         {
-            var response = await apiClient.DeleteAsync($"http://localhost:5000/api/machines/{model.Id}");
+            var response = await ApiClient.DeleteAsync($"http://localhost:5000/api/machines/{model.Id}");
             if (response.IsSuccessStatusCode)
             {
                 await DataUpdate.InvokeAsync();
