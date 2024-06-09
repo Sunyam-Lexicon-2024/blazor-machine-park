@@ -3,7 +3,7 @@
 
 @inject HttpClient apiClient
 
-<MudForm Model="@model" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+<MudForm Model="@FormModel" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     <MudCardHeader Class="d-flex">
         <h2>New Machine</h2>
         <MudSpacer></MudSpacer>
@@ -12,19 +12,19 @@
         </MudTooltip>
     </MudCardHeader>
     <MudInputControl>
-        <MudTextField @bind-Value="@model.Name" T="string" Label="Name" Required="true"
+        <MudTextField @bind-Value="@FormModel.Name" T="string" Label="Name" Required="true"
             RequiredError="A Machine name is required!" />
     </MudInputControl>
     <MudInputControl>
-        <MudSlider @bind-Value="@model.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
-            Wattage (@model.Wattage) kWh
+        <MudSlider @bind-Value="@FormModel.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+            Wattage (@FormModel.Wattage) kWh
         </MudSlider>
     </MudInputControl>
     <MudInputControl>
-        <MudNumericField @bind-Value="@model.Section" T="int" Label="Section" Min="1" Max="100" />
+        <MudNumericField @bind-Value="@FormModel.Section" T="int" Label="Section" Min="1" Max="100" />
     </MudInputControl>
     <MudInputControl>
-        <MudCheckBox @bind-Value="@model.Online" T="bool" Label="Online" />
+        <MudCheckBox @bind-Value="@FormModel.Online" T="bool" Label="Online" />
     </MudInputControl>
     <MudInputControl>
         <MudButton Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Create Machine</MudButton>
@@ -55,8 +55,8 @@
     bool success;
     public APIErrorResponseModel? apiErrorResponse { get; set; }
     string[] errors = { };
-    private MudForm? form;
-    private MachineModel model = new();
+    private MudForm form;
+    private MachineModel FormModel {get; set;}
 
     [Parameter]
     public EventCallback FormClosed { get; set; }
@@ -75,7 +75,7 @@
             using var cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromMilliseconds(15000));
 
-            var response = await apiClient.PostAsJsonAsync("http://localhost:5000/api/machines/add-machine", model, cts.Token);
+            var response = await apiClient.PostAsJsonAsync("http://localhost:5000/api/machines/add-machine", FormModel, cts.Token);
 
             await SetRequestFailure(response);
         }

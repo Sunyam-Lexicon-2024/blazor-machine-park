@@ -1,4 +1,5 @@
 @using System.Text.RegularExpressions
+@using System.Text.Json
 
 @inject HttpClient apiClient
 
@@ -12,8 +13,7 @@
     </MudCardHeader>
     <MudInputControl>
         <MudTextField @bind-Value="@FormModel.Name" T="string" Label="Name" Required="true"
-            RequiredError="A Machine name is required!"
-            Validation="@(new Func<string, IEnumerable<string>>(ValidName))" />
+            RequiredError="A Machine name is required!"/>
     </MudInputControl>
     <MudInputControl>
         <MudSlider @bind-Value="@FormModel.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
@@ -30,14 +30,31 @@
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SubmitForm">Save Changes</MudButton>
     </MudInputControl>
 </MudForm>
-@if (requestFailure is not null)
+
+@if (apiErrorResponse is not null)
 {
-    <MudText class="ma-3 pa-3" Color="@Color.Error">@requestFailure</MudText>
+    <MudText class="mt-3" Color="@Color.Error">@apiErrorResponse.Message</MudText>
+    @if (apiErrorResponse.Errors is not null)
+    {
+        @foreach (var property in apiErrorResponse.Errors)
+        {
+            <MudText Color="@Color.Error">Property: @property.Key</MudText>
+            @foreach (var error in property.Value)
+            {
+                <MudText Color="@Color.Error">Error: @error</MudText>
+            }
+        }
+    }
+    else
+    {
+        <MudText Color="@Color.Error">@apiErrorResponse.Message</MudText>
+    }
 }
 
 @code {
     bool success;
-    string? requestFailure = null;
+    public APIErrorResponseModel? apiErrorResponse { get; set; }
+
     string[] errors = { };
     private MudForm form;
     [Parameter]
@@ -46,24 +63,6 @@
     [Parameter]
     public EventCallback FormClosed { get; set; }
 
-    // TBD Move validation to API?
-    private IEnumerable<string> ValidName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            yield return "A name is required!";
-            yield break;
-        }
-        Regex pattern = new(@"[^A-Za-z0-9\-_]");
-
-        Match invalidPatternMatch = pattern.Match(name);
-
-        if (invalidPatternMatch.Success)
-        {
-            yield return @"only alphanumeric characters and ""_"" as well as ""-"" are allowed!";
-        }
-
-    }
 
     private async Task CloseForm()
     {
@@ -76,33 +75,35 @@
 
         if (success)
         {
-            try
-            {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromMilliseconds(5000));
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromMilliseconds(15000));
 
-                var response = await apiClient.PutAsJsonAsync("http://localhost:5000/api/machines/update-machine", FormModel,
-                cts.Token);
+            var response = await apiClient.PutAsJsonAsync("http://localhost:5000/api/machines/update-machine", FormModel, cts.Token);
 
-                if (!response.IsSuccessStatusCode)
+            await SetRequestFailure(response);
+        }
+    }
+
+    private async Task SetRequestFailure(HttpResponseMessage response)
+    {
+        if ((int)response.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            apiErrorResponse = JsonSerializer.Deserialize<APIErrorResponseModel>(await response.Content.ReadAsStringAsync());
+        }
+        else if (response.IsSuccessStatusCode)
+        {
+            apiErrorResponse = new()
                 {
-                    requestFailure = "API not available; please try again later.";
-                }
-                else
+                    Message = null
+                };
+            await FormClosed.InvokeAsync();
+        }
+        else
+        {
+            apiErrorResponse = new()
                 {
-                    requestFailure = null;
-                    await FormClosed.InvokeAsync();
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                requestFailure = "API not available; please try again later.";
-            }
-            catch (Exception ex)
-            {
-                requestFailure = "API not available; please try again later.";
-                Log.Error(ex.Message);
-            }
+                    Message = "API not available; please try again later."
+                };
         }
     }
 }
