@@ -19,8 +19,7 @@
 <h3 align="center">Machine Park Manager</h3>
 
   <p align="center">
- A Machine Park Management system built on Blazor.
-    
+    A Machine Park Management system built on Blazor.
     <br />
     <a href="https://github.com/sunyam-lexicon-2024/blazor-machine-park"><strong>Explore the docs »</strong></a>
     <br />
@@ -72,15 +71,11 @@
 
 A Controller based ASP.NET Web API created as part of studies carried out at [Lexicon AB](https://lexicon.se) 2024
 
-<p align="right"><a href="#readme-top">🔝</a></p>
-
 
 
 ### Assignment Document
 
 [Assignment 16 PDF](.docs/pdf/assignment-16.pdf)
-
-<p align="right"><a href="#readme-top">🔝</a></p>
 
 
 
@@ -88,8 +83,6 @@ A Controller based ASP.NET Web API created as part of studies carried out at [Le
 
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B45338%2Fgithub.com%2FSunyam-Lexicon-2024%2Ftournament-api.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B45338%2Fgithub.com%2FSunyam-Lexicon-2024%2Ftournament-api?ref=badge_shield&issueType=license)
 [![Build/Test](https://github.com/Sunyam-Lexicon-2024/blazor-machine-park/actions/workflows/build_test.yml/badge.svg)](https://github.com/Sunyam-Lexicon-2024/blazor-machine-park/actions/workflows/build_test.yml)
-
-<p align="right"><a href="#readme-top">🔝</a></p>
 
 
 
@@ -142,11 +135,12 @@ This is an example of how to install required .NET SDK and runtime on Debian 12.
    ```
 ##### 1.2 Build the project
    ```sh
-   dotnet build --solution MachinePark.UI
+   dotnet build
    ```
 ##### 1.3 Run the application
    ```sh
    dotnet run --project MachinePark.UI
+   dotnet run --project MachinePark.API
    ```
 
 #### Docker Compose
@@ -163,7 +157,6 @@ This is an example of how to install required .NET SDK and runtime on Debian 12.
 ##### 2.3 Attach to containers
 ```sh
 docker exec -it -w /workspace blazor-machine-park bash
-docker exec -it -w /workspace tournaments-identity-service bash
 ```
 ##### 2.4
 Continue from step [1.2](#12-build-the-project)
@@ -177,8 +170,15 @@ Continue from step [1.2](#12-build-the-project)
 
 **TBD**
 <br>
-Consult the Swagger documentation on [https://localhost:3000/](https://localhost:3000/) for details about interacting with the API.
+The UI development server listens on [localhost:3000](http://localhost:3000) per default, while the API runs on [localhost:5000](http://localhost:5000).
+The UI allows for reading, creating, updating and deleting available Machine resources. 
+<br>
+If no data is found or if the API is not available, the UI displays this information to the end user properly.
+Consult the Swagger documentation on [https://localhost:5000/swagger](https://localhost:5000/swagger) for details about interacting with the API.
 If the application is run locally, make sure to mirror the MSSQL setup provided with the [docker-compose](development.docker-compose.yaml) file.
+
+
+
 
 <p align="right"><a href="#readme-top">🔝</a></p>
 
@@ -187,17 +187,24 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] UI
-  - [ ]  Dashboard
-  - [ ]  Navbar
-  - [ ]  Data Table
-  - [ ]  API Interaction
-- [ ] Machine Park API
-  - [ ] Store Data
-  - [ ] Read Data
-  - [ ] Create Data
-  - [ ] Delete Data
-  - [ ] Update Data
+- [x] UI
+  - [x] Dashboard
+  - [x] Navbar
+  - [x] Data Table
+  - [x] Add Machine Form
+  - [x] Edit Machine Form
+  - [x] API Interaction
+- [x] Machine Park API
+  - [x] Store Data
+  - [x] Read Data
+  - [x] Create Data
+  - [x] Delete Data
+  - [x] Update Data
+  - [x] Model Binding
+  - [x] Entity Mapping
+  - [x] Validation
+  - [x] Error Handling
+  - [x] Documentation
 
 <br>
 
