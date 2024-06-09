@@ -1,21 +1,17 @@
-@inject HttpClient apiClient
+@inject HttpClient ApiClient
+@inject IDialogService DialogService
 
 
 <MudToolBar Class="pa-2">
     <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
-        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="@(() => SetFormMode(FormMode.Add))" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenDialog" />
     </MudTooltip>
 </MudToolBar>
 
 
 @code {
-
-    [Parameter]
-    public EventCallback<FormMode> FormModeToggle { get; set; }
-
-    private async Task SetFormMode(FormMode mode)
+    private void OpenDialog()
     {
-        MachinesView.FormMode = mode;
-        await FormModeToggle.InvokeAsync(mode);
+        DialogService.Show<AddMachineDialog>("Add Machine");
     }
 }
