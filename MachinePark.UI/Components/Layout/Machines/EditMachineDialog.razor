@@ -1,0 +1,108 @@
+@using System.Text.Json
+
+@inject HttpClient apiClient
+
+<MudDialog>
+    <DialogActions>
+        <MudForm Model="@FormModel" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudInputControl>
+                <MudTextField @bind-Value="@FormModel.Name" T="string" Label="Name" Required="true"
+                    RequiredError="A Machine name is required!" />
+            </MudInputControl>
+            <MudInputControl>
+                <MudSlider @bind-Value="@FormModel.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+                    Wattage (@FormModel.Wattage) kWh
+                </MudSlider>
+            </MudInputControl>
+            <MudInputControl>
+                <MudNumericField @bind-Value="@FormModel.Section" T="int" Label="Section" Min="1" Max="100" />
+            </MudInputControl>
+            <MudInputControl>
+                <MudCheckBox @bind-Value="@FormModel.Online" T="bool" Label="Online" />
+            </MudInputControl>
+            <MudInputControl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SubmitForm">Save Changes</MudButton>
+            </MudInputControl>
+        </MudForm>
+    </DialogActions>
+
+        <DialogContent>
+    @if (apiErrorResponse is not null)
+    {
+            <MudText class="mt-3" Color="@Color.Error">@apiErrorResponse.Message</MudText>
+            @if (apiErrorResponse.Errors is not null)
+            {
+                @foreach (var property in apiErrorResponse.Errors)
+                {
+                    <MudText Color="@Color.Error">Property: @property.Key</MudText>
+                    @foreach (var error in property.Value)
+                    {
+                        <MudText Color="@Color.Error">Error: @error</MudText>
+                    }
+                }
+            }
+            else
+            {
+                <MudText Color="@Color.Error">@apiErrorResponse.Message</MudText>
+            }
+    }
+        </DialogContent>
+</MudDialog>
+
+@code {
+    bool success;
+    public APIErrorResponseModel? apiErrorResponse { get; set; }
+    string[] errors = { };
+    private MudForm form;
+    [Parameter]
+    public MachineModel FormModel { get; set; }
+    [Parameter]
+    public EventCallback FormClosed { get; set; }
+    [Parameter]
+    public EventCallback FormSubmitted { get; set; }
+
+
+    private async Task CloseForm()
+    {
+        await FormClosed.InvokeAsync();
+    }
+
+    private async Task SubmitForm()
+    {
+        await form.Validate();
+
+        if (success)
+        {
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromMilliseconds(15000));
+
+            var response = await apiClient.PutAsJsonAsync("http://localhost:5000/api/machines/update-machine", FormModel,
+            cts.Token);
+
+            await SetAPIResponse(response);
+        }
+    }
+
+    private async Task SetAPIResponse(HttpResponseMessage response)
+    {
+        if ((int)response.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            apiErrorResponse = JsonSerializer.Deserialize<APIErrorResponseModel>(await response.Content.ReadAsStringAsync());
+        }
+        else if (response.IsSuccessStatusCode)
+        {
+            apiErrorResponse = new()
+                {
+                    Message = null
+                };
+            await FormSubmitted.InvokeAsync();
+        }
+        else
+        {
+            apiErrorResponse = new()
+                {
+                    Message = "API not available; please try again later."
+                };
+        }
+    }
+}
