@@ -1,7 +1,7 @@
 @using System.Net.Http
 @using System.Text.Json
 
-@inject HttpClient httpClient
+@inject HttpClient apiClient
 
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MachineStatsDisplay Stats=@MachineStats ApiState=@ApiState />
@@ -51,9 +51,9 @@
         try
         {
             Machines = await
-            httpClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
+            apiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
             MachineStats = await
-            httpClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+            apiClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
             ApiState = ApiState.Reachable;
         }
         catch (Exception ex)
