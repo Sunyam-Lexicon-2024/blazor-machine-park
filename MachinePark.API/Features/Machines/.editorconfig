@@ -1,3 +1,0 @@
-# CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
-[{*.cs}]
-dotnet_diagnostic.CS8618.severity = none

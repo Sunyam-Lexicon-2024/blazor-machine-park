@@ -1,7 +1,0 @@
-# CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
-[{*.cs}]
-dotnet_diagnostic.CS8618.severity = none
-
-# RZ10012: Found markup element with unexpected name 'MudIconButton'. If this is intended to be a component, add a @using directive for its namespace.
-[{*.razor}]
-dotnet_diagnostic.RZ10012.severity = none
