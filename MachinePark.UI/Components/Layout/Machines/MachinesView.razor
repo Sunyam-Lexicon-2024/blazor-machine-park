@@ -1,25 +1,16 @@
 @using System.Net.Http
 @using System.Text.Json
 
-@inject HttpClient apiClient
+@inject HttpClient ApiClient
 
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MachineStatsDisplay Stats=@MachineStats ApiState=@ApiState />
-    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())" ApiState=@ApiState
-        FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))"
-        EditFormMode="@((MachineModel model) => OnEditFormMode(model))" />
-    @if (FormMode != FormMode.Closed)
-    {
-        <MachineFormDisplay FormModel=FormModel Mode=FormMode
-            FormModeChanged="@((FormMode mode) => OnFormModeChanged(mode))" />
-    }
-    </MudContainer>
+    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())" ApiState=@ApiState />
+</MudContainer>
 
-    @code {
+@code {
     public IEnumerable<MachineModel>? Machines { get; set; }
     public MachineStatsModel? MachineStats { get; set; }
-    public MachineModel? FormModel { get; set; } = null!;
-    public static FormMode FormMode { get; set; } = FormMode.Closed;
 
     private ApiState ApiState { get; set; }
 
@@ -33,27 +24,14 @@
         await FetchData();
     }
 
-    private void OnEditFormMode(MachineModel model)
-    {
-        FormModel = model;
-        FormMode = FormMode.Edit;
-    }
-
-    private async Task OnFormModeChanged(FormMode mode)
-    {
-
-        FormMode = mode;
-        await FetchData();
-    }
-
     private async Task FetchData()
     {
         try
         {
             Machines = await
-            apiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
+            ApiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
             MachineStats = await
-            apiClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+            ApiClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
             ApiState = ApiState.Reachable;
         }
         catch (Exception ex)
