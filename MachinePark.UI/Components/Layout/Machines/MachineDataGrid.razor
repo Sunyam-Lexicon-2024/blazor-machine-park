@@ -1,7 +1,8 @@
 @inject HttpClient apiClient
 
 <MudContainer Class="d-flex flex-column mb-5">
-    <div Class="mb-5">
+    <div Class="mb-5 d-flex align-center ">
+        <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.TableView" />
         <h2>Machines</h2>
     </div>
     @if (ApiState == ApiState.Reachable)
@@ -9,14 +10,15 @@
         <MudPaper Elevation="25">
             <MachineToolBar FormModeToggle="@((FormMode mode) => @OnFormModeHasChanged(mode))" />
         </MudPaper>
-        <MudDataGrid Items="@Machines" Hover="true" ResizeMode="ResizeMode.Column" DragDropColumnReordering="true">
+        <MudDataGrid Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true"
+            RowsPerPage="10">
             <Columns>
                 <PropertyColumn Property="m => m.Id" />
                 <PropertyColumn Property="m => m.Name" />
                 <PropertyColumn Property="m => m.Online" />
                 <PropertyColumn Property="m => m.Section" />
-                <PropertyColumn Property="m => m.CreatedAt" />
-                <PropertyColumn Property="m => m.UpdatedAt" />
+                <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
+                <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
                 <TemplateColumn T="MachineModel">
                     <CellTemplate>
                         <MudTooltip Text="Delete Machine">
@@ -34,6 +36,9 @@
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>
+            <PagerContent>
+                <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
+            </PagerContent>
         </MudDataGrid>
     }
     else
