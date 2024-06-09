@@ -168,8 +168,6 @@ Continue from step [1.2](#12-build-the-project)
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-**TBD**
-<br>
 The UI development server listens on [localhost:3000](http://localhost:3000) per default, while the API runs on [localhost:5000](http://localhost:5000).
 The UI allows for reading, creating, updating and deleting available Machine resources. 
 If no data is found or if the API is not available, the UI displays this information to the end user properly.
