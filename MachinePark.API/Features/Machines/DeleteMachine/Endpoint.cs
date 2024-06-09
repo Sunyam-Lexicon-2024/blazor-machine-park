@@ -17,8 +17,6 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
 
     public override async Task<Results<Ok<Response>, NotFound, BadRequest>> ExecuteAsync(Request req, CancellationToken ct)
     {
-        Log.Information("MACHINE ID: " + req.MachineId);
-
         bool machineExists = await MachineService.AnyAsync(m => m.Id == req.MachineId);
 
         if (machineExists)

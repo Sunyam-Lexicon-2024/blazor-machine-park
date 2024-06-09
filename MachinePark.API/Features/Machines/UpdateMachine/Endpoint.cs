@@ -11,7 +11,6 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
             .Accepts<Request>("application/json")
             .Produces<Response>(200, "application/json")
             .Produces(404)
-            .Produces(400)
             .ProducesProblemFE<InternalErrorResponse>(500),
         clearDefaults: true);
     }
@@ -23,18 +22,13 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
         {
             return TypedResults.NotFound();
         }
-        try
+        else
         {
             var machineToUpdate = Map.ToEntity(req);
             var updatedMachine = await MachineService.UpdateAsync(machineToUpdate);
             await MachineService.SaveChangesAsync();
 
             return TypedResults.Ok(Map.FromEntity(updatedMachine!));
-        }
-        catch (Exception ex)
-        {
-            Log.Error("{Message}", new { Message = "Internal error while updating machine model", Error = ex });
-            return TypedResults.BadRequest();
         }
     }
 }
