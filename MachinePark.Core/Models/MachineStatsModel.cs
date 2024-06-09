@@ -5,5 +5,5 @@ public class MachineStatsModel {
     public int OnlineCount { get; set; }
     public int OfflineCount { get; set; }
     public double TotalWattage { get; set; }
-    public MachineModel LastUpdated { get; set; }
+    public MachineModel? LastUpdated { get; set; }
 }

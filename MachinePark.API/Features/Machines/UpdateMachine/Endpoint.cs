@@ -10,6 +10,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
         Description(d => d
             .Accepts<Request>("application/json")
             .Produces<Response>(200, "application/json")
+            .Produces<Response>(400, "application/json+problem")
             .Produces(404)
             .ProducesProblemFE<InternalErrorResponse>(500),
         clearDefaults: true);
