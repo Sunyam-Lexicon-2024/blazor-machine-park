@@ -15,6 +15,11 @@ services:
     command: [ "tail", "-f", "/dev/null" ]
     networks:
       - development
+    ports:
+      - 3000:3000
+      - 3001:3001
+      - 5000:5000
+      - 5001:5001
 
   database:
     container_name: machine-park-db
