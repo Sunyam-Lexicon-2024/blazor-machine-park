@@ -15,7 +15,8 @@ public static class WebAppExtensions
         services.AddScoped(sp =>
             new HttpClient
             {
-                BaseAddress = new Uri(configuration["API:BaseURI"]),
+                BaseAddress = new Uri(configuration["API:BaseURI"]!)
+                ?? throw new ArgumentException("Could not get API URI from configuration"),
                 Timeout = TimeSpan.FromSeconds(30)
             });
 

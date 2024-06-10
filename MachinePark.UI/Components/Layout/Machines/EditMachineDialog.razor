@@ -2,7 +2,7 @@
 
 @inject HttpClient ApiClient
 
-<MudDialog  Class="pa-5 ma-5">
+<MudDialog Class="pa-5 ma-5">
     <TitleContent>
         <MudText Class="d-flex align-center">
             <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Edit" />
@@ -74,7 +74,6 @@
     [Parameter]
     public EventCallback FormSubmitted { get; set; }
 
-
     private void Cancel() => MudDialog.Cancel();
 
     private async Task SubmitForm()
@@ -83,11 +82,10 @@
 
         if (success)
         {
-            var response = await ApiClient.PutAsJsonAsync("api/machines/update-machine", FormModel);
+            var response = await ApiClient.PutAsJsonAsync("machines/update-machine", FormModel);
             await SetAPIResponse(response);
         }
     }
-
     private async Task SetAPIResponse(HttpResponseMessage response)
     {
         if ((int)response.StatusCode == StatusCodes.Status400BadRequest)

@@ -1,4 +1,3 @@
-using MachinePark.UI;
 using MachinePark.UI.Components;
 using MachinePark.UI.Extensions;
 using Serilog;
@@ -19,7 +18,6 @@ try
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Error", createScopeForErrors: true);
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
     }
 
