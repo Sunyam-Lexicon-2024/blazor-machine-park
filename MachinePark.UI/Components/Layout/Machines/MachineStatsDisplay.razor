@@ -1,12 +1,13 @@
 <MudContainer>
-    <MudCard>
-        <MudCardHeader>
-            <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Analytics"></MudIcon>
-            <h3>Machine Stats</h3>
-        </MudCardHeader>
-        <MudCardContent>
+    <Element Class="mb-5 d-flex align-center ">
+        <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Analytics"></MudIcon>
+        <h2>Machine Stats</h2>
+    </Element>
+    <MudPaper>
+        <MudCard>
             @if (Stats is not null)
             {
+                <MudCardContent>
                 <MudText class="ma-2"><strong>Machine Count</strong></MudText>
                 <MudText class="ma-2">@Stats.MachineCount</MudText>
                 <MudText class="ma-2"><strong>Online Count</strong></MudText>
@@ -15,37 +16,33 @@
                 <MudText class="ma-2">@Stats.OfflineCount</MudText>
                 <MudText class="ma-2"><strong>Total Wattage (kWh)</strong></MudText>
                 <MudText class="ma-2">@Stats.TotalWattage</MudText>
-
+                </MudCardContent>
+                <MudDivider />
+                <MudCardHeader>
+                    <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Computer"></MudIcon>
+                    <MudText><strong>Last Updated Machine</strong></MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                <MudText class="ma-2"><strong>ID</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
+                <MudText class="ma-2"><strong>Name</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
+                </MudCardContent>
             }
             else
             {
                 if (ApiState == ApiState.Reachable)
                 {
-                    <MudText>No Data Available</MudText>
+                    <MudAlert Severity="Severity.Info">No Data Available</MudAlert>
                 }
                 else
                 {
-                    <MudText Color="@Color.Error">API not available</MudText>
+                    <MudAlert Severity="Severity.Error">API not available</MudAlert>
                 }
             }
-        </MudCardContent>
-    </MudCard>
-    @if (Stats is not null)
-    {
-        <MudCard Class="mt-5">
-            <MudCardHeader>
-                <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Computer"></MudIcon>
-                <h3>Last Updated Machine</h3>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudText class="ma-2"><strong>ID</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
-                <MudText class="ma-2"><strong>Name</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
-            </MudCardContent>
         </MudCard>
-    }
-    </MudContainer>
+    </MudPaper>
+</MudContainer>
 
     @code {
 

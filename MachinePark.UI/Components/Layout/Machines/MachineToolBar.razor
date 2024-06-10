@@ -1,17 +1,23 @@
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
 
-
 <MudToolBar Class="pa-2">
     <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
-        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenDialog" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="AddMachine" />
     </MudTooltip>
 </MudToolBar>
 
-
 @code {
-    private void OpenDialog()
+
+    [Parameter]
+    public EventCallback MachineAdded {get;set;}
+
+    private async Task AddMachine()
     {
-        DialogService.Show<AddMachineDialog>("Add Machine");
+        var dialog = await DialogService.ShowAsync<AddMachineDialog>();
+        var result = await dialog.Result;
+        if(!result.Cancelled) {
+            await MachineAdded.InvokeAsync();
+        }
     }
 }

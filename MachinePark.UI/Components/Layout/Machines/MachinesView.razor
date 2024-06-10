@@ -28,10 +28,8 @@
     {
         try
         {
-            Machines = await
-            ApiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("http://localhost:5000/api/machines/get-all-machines");
-            MachineStats = await
-            ApiClient.GetFromJsonAsync<MachineStatsModel>("http://localhost:5000/api/machines/stats/get-machine-stats");
+            Machines = await ApiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("machines/get-all-machines");
+            MachineStats = await ApiClient.GetFromJsonAsync<MachineStatsModel>("machines/stats/get-machine-stats");
             ApiState = ApiState.Reachable;
         }
         catch (Exception ex)

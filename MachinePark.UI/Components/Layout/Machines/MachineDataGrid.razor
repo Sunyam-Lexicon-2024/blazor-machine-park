@@ -2,49 +2,58 @@
 @inject IDialogService DialogService
 
 <MudContainer Class="d-flex flex-column mb-5">
-    <div Class="mb-5 d-flex align-center ">
+    <Element Class="mb-5 d-flex align-center ">
         <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.TableView" />
         <h2>Machines</h2>
-    </div>
+    </Element>
     @if (ApiState == ApiState.Reachable)
     {
-        <MudPaper Elevation="25">
-            <MachineToolBar />
-        </MudPaper>
-        <MudDataGrid Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true"
-            RowsPerPage="10">
-            <Columns>
-                <PropertyColumn Property="m => m.Id" />
-                <PropertyColumn Property="m => m.Name" />
-                <PropertyColumn Property="m => m.Online" />
-                <PropertyColumn Property="m => m.Section" />
-                <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
-                <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
-                <TemplateColumn T="MachineModel">
-                    <CellTemplate>
-                        <MudTooltip Text="Delete Machine">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete machine"
-                                OnClick="@(() => DeleteMachine(context.Item))" />
-                        </MudTooltip>
-                    </CellTemplate>
-                </TemplateColumn>
-                <TemplateColumn T="MachineModel">
-                    <CellTemplate>
-                        <MudTooltip Text="Edit Machine">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit machine"
-                                OnClick="@(() => EditMachine(context.Item))" />
-                        </MudTooltip>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <PagerContent>
-                <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
-            </PagerContent>
-        </MudDataGrid>
+        if(Machines is not null && Machines.Any())
+        {
+            <MudPaper Elevation="25">
+                <MachineToolBar MachineAdded="@OnMachineAdded"/>
+                <MudDivider />
+                <MudDataGrid Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true"
+                    RowsPerPage="10">
+                    <Columns>
+                        <PropertyColumn Property="m => m.Id" />
+                        <PropertyColumn Property="m => m.Name" />
+                        <PropertyColumn Property="m => m.Online" />
+                        <PropertyColumn Property="m => m.Section" />
+                        <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
+                        <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
+                        <TemplateColumn T="MachineModel">
+                            <CellTemplate>
+                                <MudTooltip Text="Delete Machine">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete machine"
+                                        OnClick="@(() => DeleteMachine(context.Item))" />
+                                </MudTooltip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="MachineModel">
+                            <CellTemplate>
+                                <MudTooltip Text="Edit Machine">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit machine"
+                                        OnClick="@(() => EditMachine(context.Item))" />
+                                </MudTooltip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <PagerContent>
+                        <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
+                    </PagerContent>
+                </MudDataGrid>
+            </MudPaper>
+        } 
+        else {
+            <MudPaper>
+                <MudAlert Severity="Severity.Info">No data available</MudAlert>
+            </MudPaper>
+        }
     }
     else
     {
-        <MudPaper Class="d-flex justify-center align-center pa-2">
+        <MudPaper>
             <MudAlert Severity="Severity.Error">API not available</MudAlert>
         </MudPaper>
     }
@@ -53,7 +62,7 @@
 @code {
 
     [Parameter]
-    public IEnumerable<MachineModel> Machines { get; set; } = [];
+    public IEnumerable<MachineModel>? Machines { get; set; } = [];
 
     [Parameter]
     public ApiState ApiState { get; set; }
@@ -65,21 +74,29 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model } };
-        DialogService.Show<EditMachineDialog>("Edit Machine", parameters);
+        var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
+        var result = await dialog.Result;
+        if(!result.Cancelled) {
+            await DataUpdate.InvokeAsync();
+        }
+    }
+
+    private async Task OnMachineAdded() {
+        await DataUpdate.InvokeAsync();
     }
 
     private async Task DeleteMachine(MachineModel model)
     {
         try
         {
-            var response = await ApiClient.DeleteAsync($"http://localhost:5000/api/machines/{model.Id}");
+            var response = await ApiClient.DeleteAsync($"machines/{model.Id}");
             if (response.IsSuccessStatusCode)
             {
                 await DataUpdate.InvokeAsync();
             }
             else
             {
-                Log.Error("RESPONSE STATUS CODE: " + response.StatusCode.ToString());
+                Log.Error("Encountered error: " + response.StatusCode.ToString());
             }
         }
         catch (Exception ex)
