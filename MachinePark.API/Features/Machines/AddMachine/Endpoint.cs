@@ -15,7 +15,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, BadRequest>, Map
         clearDefaults: true);
     }
 
-    public override async Task<Results<Ok<Response>, BadRequest>> HandleAsync(Request req, CancellationToken ct)
+    public override async Task<Results<Ok<Response>, BadRequest>> ExecuteAsync(Request req, CancellationToken ct)
     {
         bool machineExists = await MachineService.AnyAsync(m => m.Name == req.Name);
 
@@ -31,6 +31,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, BadRequest>, Map
         var createdMachine = await MachineService.AddAsync(machineToCreate);
         await MachineService.SaveChangesAsync();
 
-        return TypedResults.Ok(Map.FromEntity(createdMachine!));
+        Response response = Map.FromEntity(createdMachine!);
+        return TypedResults.Ok(response);
     }
 }
