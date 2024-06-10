@@ -29,8 +29,7 @@ try
     app.UseAntiforgery();
 
     app.MapRazorComponents<App>()
-        .AddInteractiveServerRenderMode()
-        .AddInteractiveWebAssemblyRenderMode();
+        .AddInteractiveServerRenderMode();
 
     app.Run();
     Log.Information("Application exited cleanly.");

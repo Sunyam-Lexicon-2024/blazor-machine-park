@@ -10,8 +10,7 @@ public static class WebAppExtensions
         services.AddMudServices();
 
         services.AddRazorComponents()
-                .AddInteractiveServerComponents()
-                .AddInteractiveWebAssemblyComponents();
+                .AddInteractiveServerComponents();
 
         services.AddScoped(sp =>
             new HttpClient
