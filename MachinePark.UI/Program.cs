@@ -1,5 +1,6 @@
+using MachinePark.UI;
 using MachinePark.UI.Components;
-using MudBlazor.Services;
+using MachinePark.UI.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -11,21 +12,10 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container.
-    builder.Services.AddMudServices()
-                    .AddHttpClient()
-                    .AddRazorComponents()
-                    .AddInteractiveServerComponents();
-
-    builder.Services.AddSerilog((services, loggerConfiguration) =>
-        loggerConfiguration.ReadFrom.Configuration(builder.Configuration)
-            .ReadFrom.Services(services)
-            .Enrich.FromLogContext()
-            .WriteTo.Console());
+    builder.Services.RegisterApplicationServices(builder.Configuration);
 
     var app = builder.Build();
 
-    // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -39,7 +29,8 @@ try
     app.UseAntiforgery();
 
     app.MapRazorComponents<App>()
-        .AddInteractiveServerRenderMode();
+        .AddInteractiveServerRenderMode()
+        .AddInteractiveWebAssemblyRenderMode();
 
     app.Run();
     Log.Information("Application exited cleanly.");
