@@ -19,7 +19,8 @@
 			"extensions": [
 				"ms-dotnettools.csdevkit",
 				"ms-dotnettools.vscodeintellicode-csharp",
-				"ms-mssql.mssql"
+				"ms-mssql.mssql",
+				"EditorConfig.EditorConfig"
 			]
 		}
 	}
