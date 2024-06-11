@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, BadRequest>, Map
 
         if (machineExists)
         {
-            AddError(r => r.Name, "machine with given name already exists");
+            AddError(r => r.Name, "A machine with the given name already exists");
         }
 
         ThrowIfAnyErrors();

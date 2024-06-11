@@ -1,5 +1,6 @@
 @using System.Text.Json
 
+@inject ISnackbar Snackbar
 @inject HttpClient ApiClient
 
 <MudDialog Class="pa-5 ma-5">
@@ -92,11 +93,13 @@
         if ((int)response.StatusCode == StatusCodes.Status400BadRequest)
         {
             apiErrorResponse = JsonSerializer.Deserialize<APIErrorResponseModel>(await response.Content.ReadAsStringAsync());
+            Snackbar.Add("Failed to create machine. Please try again", Severity.Error);
         }
         else if (response.IsSuccessStatusCode)
         {
             apiSuccessResponse = JsonSerializer.Deserialize<APISuccessResponseModel>(await response.Content.ReadAsStringAsync());
             MudDialog.Close(DialogResult.Ok(apiSuccessResponse.Id));
+            Snackbar.Add($@"Machine ""{FormModel.Name}"" created with ID [{apiSuccessResponse.Id}]", Severity.Success);
         }
         else
         {
@@ -104,6 +107,7 @@
                 {
                     Message = "API not available; please try again later."
                 };
+                Snackbar.Add("Could not contact API", Severity.Error);
         }
     }
 }

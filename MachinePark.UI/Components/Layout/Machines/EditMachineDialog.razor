@@ -1,5 +1,6 @@
 @using System.Text.Json
 
+@inject ISnackbar Snackbar
 @inject HttpClient ApiClient
 
 <MudDialog Class="pa-5 ma-5">
@@ -28,7 +29,7 @@
                     <MudCheckBox @bind-Value="@FormModel.Online" T="bool" Label="Online" />
                 </MudInputControl>
                 <MudInputControl Class="d-flex flex-row">
-                    <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Create Machine
+                    <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Save Changes
                     </MudButton>
                     <MudButton Variant="Variant.Filled" Color="@Color.Default" OnClick="Cancel">Cancel
                     </MudButton>
@@ -91,10 +92,12 @@
         if ((int)response.StatusCode == StatusCodes.Status400BadRequest)
         {
             apiErrorResponse = JsonSerializer.Deserialize<APIErrorResponseModel>(await response.Content.ReadAsStringAsync());
+            Snackbar.Add($@"Unable to edit Machine ""{FormModel.Name}"". Please try again", Severity.Error);
         }
         else if (response.IsSuccessStatusCode)
         {
             MudDialog.Close(DialogResult.Ok(FormModel.Id));
+            Snackbar.Add($@"Machine ""{FormModel.Name}"" successfully edited", Severity.Success);
         }
         else
         {
@@ -102,6 +105,7 @@
                 {
                     Message = "API not available; please try again later."
                 };
+            Snackbar.Add("Could not contact API", Severity.Error);
         }
     }
 }

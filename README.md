@@ -193,6 +193,9 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Add Machine Form
   - [x] Edit Machine Form
   - [x] API Interaction
+  - [x] MudBlazor
+    - [x] MudDataGrid
+    - [x] MudDialog (Add/Edit Machine interaction)
 - [x] Machine Park API
   - [x] Store Data
   - [x] Read Data
@@ -203,7 +206,7 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Entity Mapping
   - [x] Validation
   - [x] Error Handling
-  - [x] Documentation
+  - [x] Swagger Documentation
 
 <br>
 
