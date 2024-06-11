@@ -196,6 +196,7 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] MudBlazor
     - [x] MudDataGrid
     - [x] MudDialog (Add/Edit Machine interaction)
+  - [ ] WASM Client 
 - [x] Machine Park API
   - [x] Store Data
   - [x] Read Data
@@ -205,8 +206,20 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Model Binding
   - [x] Entity Mapping
   - [x] Validation
-  - [x] Error Handling
+  - [x] Exception Handling
   - [x] Swagger Documentation
+  - [ ] Response Caching
+  - [ ] Rate Limiting
+  - [ ] Pre/Post Processors
+  - [ ] Event Bus
+  - [ ] Command Bus
+  - [ ] Joq Queues
+  - [ ] Remote Procedure Calls
+  - [ ] Server Sent Events
+  - [ ] OAuth2/OIDC
+  - [ ] Testing
+    - [ ] Unit
+    - [ ] Integration/E2E
 
 <br>
 
