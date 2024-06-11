@@ -34,6 +34,7 @@ try
     else
     {
         app.UseDefaultExceptionHandler()
+           .UseResponseCaching()
            .UseFastEndpoints();
     }
 

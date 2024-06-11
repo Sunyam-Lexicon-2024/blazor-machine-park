@@ -9,18 +9,19 @@ public static class WebAppExtensions
     {
         services
             .AddFastEndpoints()
-            .SwaggerDocument(o =>
+            .AddResponseCaching()
+            .SwaggerDocument(options =>
             {
-                o.DocumentSettings = s =>
+                options.DocumentSettings = document =>
                 {
-                    s.Title = "Machine Park API";
-                    s.Version = "v1";
+                    document.Title = "Machine Park API";
+                    document.Version = "v1";
                 };
             })
             .AddSerilog();
 
-        services.AddDbContext<MachineParkDbContext>(opt =>
-             opt.UseSqlServer(configuration.GetConnectionString("Default")));
+        services.AddDbContext<MachineParkDbContext>(options =>
+             options.UseSqlServer(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IMachineService, MachineService>();
 
