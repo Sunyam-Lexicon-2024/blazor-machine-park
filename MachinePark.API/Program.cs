@@ -1,4 +1,5 @@
 using MachinePark.API.Extensions;
+using MachinePark.API.Filters;
 
 Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -16,10 +17,10 @@ try
         app.UseDeveloperExceptionPage();
 
         app.UseDefaultExceptionHandler()
-           .UseFastEndpoints(configuration =>
+           .UseFastEndpoints(config =>
            {
-               configuration.Endpoints.RoutePrefix = "api";
-               configuration.Endpoints.Configurator = ep =>
+               config.Endpoints.RoutePrefix = "api";
+               config.Endpoints.Configurator = ep =>
                {
                    ep.AllowAnonymous(); // no auth for now
                };
@@ -35,7 +36,10 @@ try
     {
         app.UseDefaultExceptionHandler()
            .UseResponseCaching()
-           .UseFastEndpoints();
+           .UseFastEndpoints(config => config.Endpoints.Configurator = ep =>
+           {
+               ep.Options(o => o.AddEndpointFilter<OperationCancelledFilter>());
+           });
     }
 
     app.Run();

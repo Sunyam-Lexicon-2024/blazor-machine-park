@@ -209,7 +209,7 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Exception Handling
   - [x] Swagger Documentation
   - [x] Response Caching
-  - [ ] Endpoint Filters
+  - [x] Endpoint Filters
   - [ ] Event Bus (?)
   - [ ] Command Bus (?)
   - [ ] Joq Queues (?)
