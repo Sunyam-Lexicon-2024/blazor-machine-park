@@ -6,7 +6,7 @@ namespace MachinePark.UI.Extensions;
 
 public static class WebAppExtensions
 {
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddMudServices(config => {
             config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
@@ -26,13 +26,13 @@ public static class WebAppExtensions
         services.AddScoped(sp =>
             new HttpClient
             {
-                BaseAddress = new Uri(configuration["API:BaseURI"]!)
+                BaseAddress = new Uri(config["API:BaseURI"]!)
                 ?? throw new ArgumentException("Could not get API URI from configuration"),
                 Timeout = TimeSpan.FromSeconds(30)
             });
 
-        services.AddSerilog((services, loggerConfiguration) =>
-            loggerConfiguration.ReadFrom.Configuration(configuration)
+        services.AddSerilog((services, loggerConfig) =>
+            loggerConfig.ReadFrom.Configuration(config)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
                 .WriteTo.Console());
