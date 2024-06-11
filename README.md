@@ -208,14 +208,12 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Validation
   - [x] Exception Handling
   - [x] Swagger Documentation
-  - [ ] Response Caching
-  - [ ] Rate Limiting
+  - [x] Response Caching
   - [ ] Pre/Post Processors
-  - [ ] Event Bus
-  - [ ] Command Bus
-  - [ ] Joq Queues
-  - [ ] Remote Procedure Calls
-  - [ ] Server Sent Events
+  - [ ] Event Bus (?)
+  - [ ] Command Bus (?)
+  - [ ] Joq Queues (?)
+  - [ ] Server Sent Events 
   - [ ] OAuth2/OIDC
   - [ ] Testing
     - [ ] Unit
