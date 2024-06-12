@@ -19,7 +19,11 @@
                     ShowMenuIcon="true"
                 >
                     <ToolBarContent>
-                        <MachineToolBar DataSetSizeChange="@OnDataSetSizeChange" />
+                        <MachineToolBar
+                            DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))" 
+                            SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))" 
+                            MachineAdded="@(() => OnMachineAdded())"
+                            />
                         <MudSpacer/>
                     </ToolBarContent>
                     <Columns>
@@ -64,11 +68,16 @@
 
 @code {
 
+    [Parameter]
+    public EventCallback DataUpdated {get;set;}
+
     private string SortInfo = string.Empty;
 
-    private MudDataGrid<MachineModel> _dataGrid { get; set;}
+    private MudDataGrid<MachineModel>? _dataGrid { get; set;}
 
-    private int DataSetSize {get;set;} = 100;
+    private int _dataSetSize = 100;
+
+    private string? _searchTerm;
 
     private async Task<GridData<MachineModel>> LoadData(GridState<MachineModel> state) 
     {
@@ -76,9 +85,9 @@
     
         MachineData?  machineData = await FetchData(state);
 
-        if(machineData is not null && machineData.Machines.Any()) 
+        if(machineData is not null && machineData.Machines!.Any()) 
         {
-            data.Items = machineData.Machines.Take(_dataGrid.RowsPerPage);
+            data.Items = machineData.Machines!.Take(_dataGrid!.RowsPerPage);
             data.TotalItems = machineData.SetSize;
         }
         else
@@ -91,7 +100,7 @@
     }
 
     private class MachineData {
-        public IEnumerable<MachineModel> Machines {get;set;}
+        public IEnumerable<MachineModel>? Machines {get;set;}
         public int SetSize {get;set;}
     }
 
@@ -99,13 +108,22 @@
 
         MachineData? machineData;
 
-        string queryURL = "machines/get-all-machines";
+        var queryString = CompileQueryString(state);
+
+        machineData = await ApiClient.GetFromJsonAsync<MachineData>(queryString);
         
-        if(DataSetSize == 0) {
-            queryURL += $"?Page={state.Page}&PageSize={state.PageSize}&SetSize={DataSetSize}";
+        return machineData;
+    }
+
+    private string CompileQueryString(GridState<MachineModel> state) {
+
+        string queryString = "machines/get-all-machines";
+
+        if(_dataSetSize == 0) {
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}&SetSize={_dataSetSize}";
         }
         else {
-            queryURL += $"?Page={state.Page}&PageSize={state.PageSize}";
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}";
         }
 
         if (state.SortDefinitions.Any()) {
@@ -115,19 +133,30 @@
                 var isGuid = Guid.TryParse(def.SortBy, out _);
                 var sortBy = isGuid? def.SortFunc(new MachineModel()).ToString() : def.SortBy;
                 var sortDirection = def.Descending ? "Descending" : "Ascending";
-                queryURL += $"&SortBy={sortBy}&SortDirection={sortDirection}";
+                queryString += $"&SortBy={sortBy}&SortDirection={sortDirection}";
             }
         }
 
-        machineData = await ApiClient.GetFromJsonAsync<MachineData>(queryURL);
-        
-        return machineData;
+        if(!string.IsNullOrWhiteSpace(_searchTerm)) {
+            queryString += $"&Search={_searchTerm}";
+        }
+
+        return queryString;
+    }
+
+    private async Task OnSearchInitiated(string? searchTerm) {
+        _searchTerm = searchTerm;
+        await _dataGrid!.ReloadServerData();
     }
 
     private async Task OnDataSetSizeChange(int newSetSize){
-        DataSetSize = newSetSize;
-        await _dataGrid.ReloadServerData();
-        await _dataGrid.SetRowsPerPageAsync(5);
+        _dataSetSize = newSetSize;
+        await _dataGrid!.ReloadServerData();
+    }
+
+    private async Task OnMachineAdded() {
+        await DataUpdated.InvokeAsync();
+        await _dataGrid!.ReloadServerData();
     }
 
     private async Task EditMachine(MachineModel model)

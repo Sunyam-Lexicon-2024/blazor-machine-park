@@ -12,21 +12,21 @@
     </TitleContent>
     <DialogActions>
         <MudPaper>
-            <MudForm Model="@FormModel" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudForm Model="@FormModel" @ref="_form" @bind-IsValid="@success" @bind-Errors="@errors">
                 <MudInputControl>
-                    <MudTextField @bind-Value="@FormModel.Name" T="string" Label="Name" Required="true"
+                    <MudTextField @bind-Value="@FormModel!.Name" T="string" Label="Name" Required="true"
                         RequiredError="A Machine name is required!" />
                 </MudInputControl>
                 <MudInputControl>
-                    <MudSlider @bind-Value="@FormModel.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
-                        Wattage (@FormModel.Wattage) kWh
+                    <MudSlider @bind-Value="@FormModel!.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+                        Wattage (@FormModel!Wattage) kWh
                     </MudSlider>
                 </MudInputControl>
                 <MudInputControl>
-                    <MudNumericField @bind-Value="@FormModel.Section" T="int" Label="Section" Min="1" Max="100" />
+                    <MudNumericField @bind-Value="@FormModel!.Section" T="int" Label="Section" Min="1" Max="100" />
                 </MudInputControl>
                 <MudInputControl>
-                    <MudCheckBox @bind-Value="@FormModel.Online" T="bool" Label="Online" />
+                    <MudCheckBox @bind-Value="@FormModel!.Online" T="bool" Label="Online" />
                 </MudInputControl>
                 <MudInputControl Class="d-flex flex-row">
                     <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Save Changes
@@ -63,23 +63,23 @@
 
 @code {
     [CascadingParameter] 
-    MudDialogInstance MudDialog { get; set; }
+    MudDialogInstance? MudDialog { get; set; }
     bool success;
     public APIErrorResponseModel? apiErrorResponse { get; set; }
     string[] errors = { };
-    private MudForm form;
+    private MudForm? _form;
     [Parameter]
-    public MachineModel FormModel { get; set; }
+    public MachineModel? FormModel { get; set; }
     [Parameter]
     public EventCallback FormClosed { get; set; }
     [Parameter]
     public EventCallback FormSubmitted { get; set; }
 
-    private void Cancel() => MudDialog.Cancel();
+    private void Cancel() => MudDialog!.Cancel();
 
     private async Task SubmitForm()
     {
-        await form.Validate();
+        await _form!.Validate();
 
         if (success)
         {
@@ -92,12 +92,12 @@
         if ((int)response.StatusCode == StatusCodes.Status400BadRequest)
         {
             apiErrorResponse = JsonSerializer.Deserialize<APIErrorResponseModel>(await response.Content.ReadAsStringAsync());
-            Snackbar.Add($@"Unable to edit Machine ""{FormModel.Name}"". Please try again", Severity.Error);
+            Snackbar.Add($@"Unable to edit Machine ""{FormModel!.Name}"". Please try again", Severity.Error);
         }
         else if (response.IsSuccessStatusCode)
         {
-            MudDialog.Close(DialogResult.Ok(FormModel.Id));
-            Snackbar.Add($@"Machine ""{FormModel.Name}"" successfully edited", Severity.Success);
+            MudDialog!.Close(DialogResult.Ok(FormModel!.Id));
+            Snackbar.Add($@"Machine ""{FormModel!.Name}"" successfully edited", Severity.Success);
         }
         else
         {
