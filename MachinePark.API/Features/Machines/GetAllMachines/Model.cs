@@ -3,6 +3,8 @@ namespace Machines.GetAllMachines;
 public class Request
 {
     [QueryParam]
+    public string? Search { get; set; }
+    [QueryParam]
     public int? Page { get; set; }
     [QueryParam]
     public int? PageSize { get; set; }

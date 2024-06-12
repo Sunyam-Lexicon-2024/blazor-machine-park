@@ -29,6 +29,7 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
         {
             QueryParams queryParams = new()
             {
+                SearchTerm = req.Search,
                 Page = req.Page,
                 PageSize = req.PageSize,
                 SortProp = !string.IsNullOrWhiteSpace(req.SortBy) ? Enum.Parse<SortProp>(req.SortBy) : null,

@@ -4,6 +4,7 @@ namespace MachinePark.API.Services;
 
 public interface IQueryParams
 {
+    public string? SearchTerm {get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
     public int? SetSize { get; set; }
@@ -13,6 +14,7 @@ public interface IQueryParams
 
 public class QueryParams : IQueryParams
 {
+    public string? SearchTerm {get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
     public int? SetSize { get; set; }
@@ -58,25 +60,31 @@ sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return await _machineParkDbContext.Machines.ToListAsync();
     }
 
-    public async Task<IEnumerable<Machine>> GetAllMachinesAsync(QueryParams queryParams)
+    public async Task<IEnumerable<Machine>> GetAllMachinesAsync(QueryParams qp)
     {
         var machines = _machineParkDbContext.Machines.AsQueryable();
 
-        if (queryParams.SortProp is not null)
+        if (qp.SortProp is not null)
         {
-            machines = queryParams.SortDirection == SortDirection.Descending ? 
-                machines.OrderByDescending(m => EF.Property<string>(m, queryParams.SortProp.ToString()!)) 
+            machines = qp.SortDirection == SortDirection.Descending ? 
+                machines.OrderByDescending(m => EF.Property<string>(m, qp.SortProp.ToString()!)) 
                 :
-                machines.OrderBy(m => EF.Property<string>(m, queryParams.SortProp.ToString()!));
+                machines.OrderBy(m => EF.Property<string>(m, qp.SortProp.ToString()!));
 
 
         }
 
-        if (queryParams.Page is not null && queryParams.PageSize is not null)
+        if (qp.Page is not null && qp.PageSize is not null)
         {
             machines = machines
-                        .Skip((queryParams.Page * queryParams.PageSize) ?? 0)
-                        .Take(queryParams.SetSize ?? machines.Count());
+                        .Skip((qp.Page * qp.PageSize) ?? 0)
+                        .Take(qp.SetSize ?? machines.Count());
+        }
+
+        if(!string.IsNullOrWhiteSpace(qp.SearchTerm)) {
+            machines = machines.Where(m => m.Name.Contains(qp.SearchTerm))
+                               .Where(m => m.Id == int.Parse(qp.SearchTerm))
+                               .Where(m => m.Section == int.Parse(qp.SearchTerm));
         }
 
         return await machines.ToListAsync();
