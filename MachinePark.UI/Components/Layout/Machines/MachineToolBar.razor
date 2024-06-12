@@ -1,7 +1,7 @@
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
 
-<MudElement Class="d-flex flex-row justify-center align-center">
+<MudElement Class="d-flex flex-row justify-center align-center ">
     <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
         <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="AddMachine" />
     </MudTooltip>
@@ -15,7 +15,11 @@
             <MudSelectItem T="int" Value="0">All</MudSelectItem>
         </MudSelect>
     </MudTooltip>
+    <MudTextField Class="mx-2" T="string" InputType="InputType.Search" Variant="Variant.Outlined"
+        Margin="Margin.Dense" Label="Search" On></MudTextField>
+    <MudButton Class="mx-2" Variant="Variant.Filled" Color="Color.Primary">Search</MudButton>
 </MudElement>
+
 
 @code {
 
