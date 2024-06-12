@@ -210,9 +210,8 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] Swagger Documentation
   - [x] Response Caching
   - [x] Endpoint Filters
-  - [ ] Pagination
-  - [ ] Filtering
-  - [ ] Sorting
+  - [x] (Server Side) Pagination
+  - [x] (Server Side) Sorting
   - [ ] Searching
   - [ ] Server Sent Events 
   - [ ] OAuth2/OIDC
