@@ -1,14 +1,14 @@
-namespace Machines.GetAllMachines;
+namespace Machines.GetAllMachines.Paginated;
 
-public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<IEnumerable<MachineModel>>,
-                                           NoContent>, Mapper>
+public class Endpoint : Endpoint<PaginatedRequest,
+    Results<Ok<IEnumerable<MachineModel>>, NoContent>, Mapper>
 {
 
     public IMachineService MachineService { get; set; }
 
     public override void Configure()
     {
-        Get("/machines/get-all-machines");
+        Get("/machines/get-all-machines?Page={Page}&PageSize={PageSize}");
         ResponseCache(60);
         Options(r => r.CacheOutput(o => o.Expire(TimeSpan.FromSeconds(60))));
         Description(d => d
@@ -18,9 +18,9 @@ public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<IEnumerable<Mac
     }
 
     public override async Task<Results<Ok<IEnumerable<MachineModel>>, NoContent>>
-    ExecuteAsync(CancellationToken ct)
+        ExecuteAsync(PaginatedRequest req, CancellationToken ct)
     {
-        var machines = await MachineService.GetAllMachinesAsync();
+        var machines = await MachineService.GetAllMachinesAsync(new QueryParams() { Page = req.Page, PageSize = req.PageSize });
         var models = machines.Select(Map.FromEntity);
 
         if (!models.Any())

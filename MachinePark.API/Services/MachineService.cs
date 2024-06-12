@@ -2,9 +2,22 @@ using System.Linq.Expressions;
 
 namespace MachinePark.API.Services;
 
+public interface IQueryParams
+{
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
+}
+
+public class QueryParams : IQueryParams
+{
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
+}
+
 public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
+    Task<IEnumerable<Machine>> GetAllMachinesAsync(QueryParams queryParams);
     Task<Machine?> GetByIdAsync(int machineId);
     Task<Machine?> AddAsync(Machine machine);
     Task<Machine?> UpdateAsync(Machine machine);
@@ -13,13 +26,28 @@ public interface IMachineService
     Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression);
     Task SaveChangesAsync();
 }
-public class MachineService(MachineParkDbContext machineParkDbContext) : IMachineService
+
+sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachineService
 {
     private readonly MachineParkDbContext _machineParkDbContext = machineParkDbContext;
 
     public async Task<IEnumerable<Machine>> GetAllMachinesAsync()
     {
         return await _machineParkDbContext.Machines.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Machine>> GetAllMachinesAsync(QueryParams queryParams)
+    {
+        var machines = _machineParkDbContext.Machines.AsQueryable();
+
+        if (queryParams.Page is not null && queryParams.PageSize is not null)
+        {
+            machines = machines
+                        .Skip((int)(queryParams.Page * queryParams.PageSize))
+                        .Take((int)queryParams.PageSize);
+        }
+        
+        return await machines.ToListAsync();
     }
 
     public async Task<Machine?> GetByIdAsync(int machineId)
