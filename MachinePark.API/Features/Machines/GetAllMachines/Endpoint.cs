@@ -1,6 +1,6 @@
 namespace Machines.GetAllMachines;
 
-public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<IEnumerable<MachineModel>>,
+public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
                                            NoContent>, Mapper>
 {
 
@@ -10,27 +10,48 @@ public sealed class Endpoint : EndpointWithoutRequest<Results<Ok<IEnumerable<Mac
     {
         Get("/machines/get-all-machines");
         ResponseCache(60);
-        Options(r => r.CacheOutput(o => o.Expire(TimeSpan.FromSeconds(60))));
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)
-        .ProducesProblemFE<InternalErrorResponse>(500),
-    clearDefaults: true);
+        .ProducesProblemFE<InternalErrorResponse>(500), clearDefaults: true);
     }
 
-    public override async Task<Results<Ok<IEnumerable<MachineModel>>, NoContent>>
-    ExecuteAsync(CancellationToken ct)
+    public override async Task<Results<Ok<Response>, NoContent>>
+    ExecuteAsync(Request? req, CancellationToken ct)
     {
-        var machines = await MachineService.GetAllMachinesAsync();
-        var models = machines.Select(Map.FromEntity);
+        IEnumerable<Machine> machines;
 
-        if (!models.Any())
+        if (req == null)
         {
-            return TypedResults.NoContent();
+            machines = await MachineService.GetAllMachinesAsync();
         }
         else
         {
-            return TypedResults.Ok(models);
+            QueryParams queryParams = new()
+            {
+                Page = req.Page,
+                PageSize = req.PageSize,
+                SortProp = !string.IsNullOrWhiteSpace(req.SortBy) ? Enum.Parse<SortProp>(req.SortBy) : null,
+                SortDirection = !string.IsNullOrWhiteSpace(req.SortDirection) ? Enum.Parse<SortDirection>(req.SortDirection) : null
+            };
+
+            machines = await MachineService.GetAllMachinesAsync(queryParams);
+        }
+
+        if (!machines.Any())
+        {
+            return TypedResults.NoContent();
+        }
+
+        else
+        {
+            Response response = new()
+            {
+                Machines = machines.Select(Map.FromEntity),
+                SetSize = MachineService.GetDataSetCount(req.SetSize)
+            };
+
+            return TypedResults.Ok(response);
         }
     }
 }

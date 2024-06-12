@@ -1,3 +1,4 @@
+using MachinePark.API.Filters;
 using MachinePark.Data.Seeds;
 
 namespace MachinePark.API.Extensions;
@@ -5,30 +6,42 @@ namespace MachinePark.API.Extensions;
 public static class WebAppExtensions
 {
 
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static async Task<WebApplication> ConfigureWebApplication(this WebApplication app)
     {
-        services
-            .AddFastEndpoints()
-            .AddResponseCaching()
-            .SwaggerDocument(options =>
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage()
+               .UseDefaultExceptionHandler()
+               .UseResponseCaching()
+               .UseFastEndpoints(config =>
+               {
+                   config.Endpoints.RoutePrefix = "api";
+                   config.Endpoints.Configurator = ep =>
+                   {
+                       ep.AllowAnonymous(); // no auth for now
+                       ep.Options(o => o.AddEndpointFilter<OperationCancelledFilter>());
+                   };
+               })
+               .UseSwaggerGen();
+
+            if (Environment.GetEnvironmentVariable("SEED_DATA") == "1")
             {
-                options.DocumentSettings = document =>
-                {
-                    document.Title = "Machine Park API";
-                    document.Version = "v1";
-                };
-            })
-            .AddSerilog();
-
-        services.AddDbContext<MachineParkDbContext>(options =>
-             options.UseSqlServer(configuration.GetConnectionString("Default")));
-
-        services.AddScoped<IMachineService, MachineService>();
-
-        return services;
+                await app.SeedDataAsync();
+            }
+        }
+        else
+        {
+            app.UseDefaultExceptionHandler()
+               .UseResponseCaching()
+               .UseFastEndpoints(config => config.Endpoints.Configurator = ep =>
+               {
+                   ep.Options(o => o.AddEndpointFilter<OperationCancelledFilter>());
+               });
+        }
+        return app;
     }
 
-    public static async Task SeedDataAsync(this IApplicationBuilder app)
+    private static async Task SeedDataAsync(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
         var logger = app.ApplicationServices.GetService<ILogger<Program>>() ?? throw new ArgumentException("Could not acquire Logger from Service Collection");

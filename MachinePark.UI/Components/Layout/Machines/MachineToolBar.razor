@@ -1,23 +1,41 @@
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
 
-<MudToolBar Class="pa-2">
+<MudElement Class="d-flex flex-row justify-center align-center">
     <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
         <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="AddMachine" />
     </MudTooltip>
-</MudToolBar>
+    <MudTooltip Text="Select the amount of data to get" Delay="300" Duration="500">
+        <MudSelect Value="@SizeSelection" ValueChanged="@((int value) => SetDataSize(value))" T="int"
+            Variant="Variant.Outlined" Label="set size" Margin="Margin.Dense">
+            @foreach (var size in DataSizes)
+            {
+                <MudSelectItem T="int" Value="@(size)" />
+            }
+            <MudSelectItem T="int" Value="0">All</MudSelectItem>
+        </MudSelect>
+    </MudTooltip>
+</MudElement>
 
 @code {
 
+    private IEnumerable<int> DataSizes = [100, 500, 1000, 1500, 2000, 2500, 5000];
+
+    private int SizeSelection { get; set; } = 100;
+
+
     [Parameter]
-    public EventCallback MachineAdded {get;set;}
+    public EventCallback<int> DataSetSizeChange { get; set; }
+
+    private async Task SetDataSize(int size)
+    {
+        SizeSelection = size;
+        await DataSetSizeChange.InvokeAsync(size);
+    }
 
     private async Task AddMachine()
     {
         var dialog = await DialogService.ShowAsync<AddMachineDialog>();
         var result = await dialog.Result;
-        if(!result.Cancelled) {
-            await MachineAdded.InvokeAsync();
-        }
     }
 }
