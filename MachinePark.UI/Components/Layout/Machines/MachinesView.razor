@@ -2,7 +2,7 @@
 @using System.Text.Json
 
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
-    <MachineStatsDisplay ref="@_statsDisplay" />
+    <MachineStatsDisplay @ref="@_statsDisplay" />
     <MachineDataGrid DataUpdated="@(() => OnDataUpdated())" />
 </MudContainer>
 

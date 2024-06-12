@@ -4,7 +4,7 @@ namespace MachinePark.API.Services;
 
 public interface IQueryParams
 {
-    public string? SearchTerm {get; set; }
+    public string? SearchTerm { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
     public int? SetSize { get; set; }
@@ -14,7 +14,7 @@ public interface IQueryParams
 
 public class QueryParams : IQueryParams
 {
-    public string? SearchTerm {get; set; }
+    public string? SearchTerm { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
     public int? SetSize { get; set; }
@@ -32,7 +32,8 @@ public enum SortProp
     UpdatedAt,
 }
 
-public enum SortDirection {
+public enum SortDirection
+{
     Ascending,
     Descending
 }
@@ -66,12 +67,14 @@ sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
 
         if (qp.SortProp is not null)
         {
-            machines = qp.SortDirection == SortDirection.Descending ? 
-                machines.OrderByDescending(m => EF.Property<string>(m, qp.SortProp.ToString()!)) 
+            machines = qp.SortDirection == SortDirection.Descending ?
+                machines.OrderByDescending(m => EF.Property<string>(m, qp.SortProp.ToString()!))
                 :
                 machines.OrderBy(m => EF.Property<string>(m, qp.SortProp.ToString()!));
-
-
+        }
+        else
+        {
+            machines = machines.OrderBy(m => m.Id);
         }
 
         if (qp.Page is not null && qp.PageSize is not null)
@@ -81,10 +84,9 @@ sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
                         .Take(qp.SetSize ?? machines.Count());
         }
 
-        if(!string.IsNullOrWhiteSpace(qp.SearchTerm)) {
-            machines = machines.Where(m => m.Name.Contains(qp.SearchTerm))
-                               .Where(m => m.Id == int.Parse(qp.SearchTerm))
-                               .Where(m => m.Section == int.Parse(qp.SearchTerm));
+        if (!string.IsNullOrWhiteSpace(qp.SearchTerm))
+        {
+            machines = machines.Where(m => m.Name.Contains(qp.SearchTerm));
         }
 
         return await machines.ToListAsync();

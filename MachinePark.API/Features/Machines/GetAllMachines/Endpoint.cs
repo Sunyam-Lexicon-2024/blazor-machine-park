@@ -9,7 +9,6 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
     public override void Configure()
     {
         Get("/machines/get-all-machines");
-        ResponseCache(60);
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)
