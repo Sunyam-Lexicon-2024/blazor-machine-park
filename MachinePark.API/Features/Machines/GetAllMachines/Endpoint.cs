@@ -1,15 +1,13 @@
 namespace Machines.GetAllMachines;
 
-public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
+public class Endpoint : Endpoint<Request, Results<Ok<Response>,
                                            NoContent>, Mapper>
 {
-
     public IMachineService MachineService { get; set; }
 
     public override void Configure()
     {
         Get("/machines/get-all-machines");
-        ResponseCache(60);
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)
@@ -29,6 +27,7 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
         {
             QueryParams queryParams = new()
             {
+                SearchTerm = req.Search,
                 Page = req.Page,
                 PageSize = req.PageSize,
                 SortProp = !string.IsNullOrWhiteSpace(req.SortBy) ? Enum.Parse<SortProp>(req.SortBy) : null,

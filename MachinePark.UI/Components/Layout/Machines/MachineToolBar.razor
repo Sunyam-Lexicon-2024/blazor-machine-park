@@ -1,12 +1,12 @@
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
 
-<MudElement Class="d-flex flex-row justify-center align-center">
+<MudElement Class="d-flex flex-row justify-center align-center ">
     <MudTooltip Text="Add New Machine" Delay="300" Duration="500">
         <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="AddMachine" />
     </MudTooltip>
     <MudTooltip Text="Select the amount of data to get" Delay="300" Duration="500">
-        <MudSelect Value="@SizeSelection" ValueChanged="@((int value) => SetDataSize(value))" T="int"
+        <MudSelect Value="@_sizeSelection" ValueChanged="@((int value) => SetDataSize(value))" T="int"
             Variant="Variant.Outlined" Label="set size" Margin="Margin.Dense">
             @foreach (var size in DataSizes)
             {
@@ -15,21 +15,36 @@
             <MudSelectItem T="int" Value="0">All</MudSelectItem>
         </MudSelect>
     </MudTooltip>
+    <MudTextField Class="mx-2" T="string" InputType="InputType.Search" Variant="Variant.Outlined"
+        Margin="Margin.Dense" Label="Search" @ref="@_searchInput"></MudTextField>
+    <MudButton Class="mx-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="Search">Search</MudButton>
 </MudElement>
+
 
 @code {
 
     private IEnumerable<int> DataSizes = [100, 500, 1000, 1500, 2000, 2500, 5000];
 
-    private int SizeSelection { get; set; } = 100;
+    private int _sizeSelection = 100;
 
+    private MudTextField<string>? _searchInput;
 
     [Parameter]
     public EventCallback<int> DataSetSizeChange { get; set; }
+    
+    [Parameter]
+    public EventCallback<string?> SearchInitiated { get; set; }
+    
+    [Parameter]
+    public EventCallback MachineAdded { get; set; }    
+
+    private async Task Search() {
+        await SearchInitiated.InvokeAsync(_searchInput?.Value);
+    }
 
     private async Task SetDataSize(int size)
     {
-        SizeSelection = size;
+        _sizeSelection = size;
         await DataSetSizeChange.InvokeAsync(size);
     }
 
@@ -37,5 +52,8 @@
     {
         var dialog = await DialogService.ShowAsync<AddMachineDialog>();
         var result = await dialog.Result;
+        if(!result.Canceled) {
+            await MachineAdded.InvokeAsync();
+        }
     }
 }
