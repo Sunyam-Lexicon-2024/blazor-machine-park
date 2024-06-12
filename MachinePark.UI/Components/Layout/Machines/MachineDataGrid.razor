@@ -2,10 +2,10 @@
 @inject IDialogService DialogService
 
 <MudContainer Class="d-flex flex-column mb-5">
-    <Element Class="mb-5 d-flex align-center ">
+    <MudElement HtmlTag="div" Class="mb-5 d-flex align-center ">
         <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.TableView" />
         <h2>Machines</h2>
-    </Element>
+    </MudElement>
     @if (ApiState == ApiState.Reachable)
     {
         if(Machines is not null && Machines.Any())
@@ -13,12 +13,26 @@
             <MudPaper Elevation="25">
                 <MachineToolBar MachineAdded="@OnMachineAdded"/>
                 <MudDivider />
-                <MudDataGrid Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true"
-                    RowsPerPage="10">
+                <MudDataGrid
+                    ServerData="@((GridState<MachineModel> state) => GetMachineServerData(state))"
+                    Hover="true" 
+                    ColumnResizeMode="@ResizeMode.Container" 
+                    DragDropColumnReordering="true"
+                    RowsPerPage="5" 
+                >
                     <Columns>
                         <PropertyColumn Property="m => m.Id" />
                         <PropertyColumn Property="m => m.Name" />
-                        <PropertyColumn Property="m => m.Online" />
+                        <TemplateColumn Title="Status" SortBy="@(m => m.Online)">
+                            <CellTemplate>
+                                @if(context.Item.Online) {
+                                    <MudElement> <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.OfflineBolt" /> </MudElement>
+                                }
+                                else {
+                                    <MudElement> <MudIcon Color="@Color.Error" Icon="@Icons.Material.Filled.OfflineBolt" /> </MudElement>
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
                         <PropertyColumn Property="m => m.Section" />
                         <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
                         <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
@@ -40,7 +54,7 @@
                         </TemplateColumn>
                     </Columns>
                     <PagerContent>
-                        <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
+                        <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20})/>
                     </PagerContent>
                 </MudDataGrid>
             </MudPaper>
@@ -70,13 +84,32 @@
     [Parameter]
     public EventCallback DataUpdate { get; set; }
 
+    private async Task<GridData<MachineModel>> GetMachineServerData(GridState<MachineModel> state) 
+    {
+        GridData<MachineModel> data = new();    
+        
+        var machineData = await ApiClient.GetFromJsonAsync<IEnumerable<MachineModel>>($"machines/get-all-machines?Page={state.Page}&PageSize={state.PageSize}");
+        
+        if(machineData is not null && machineData.Any()) 
+        {
+            data.Items = machineData;
+            data.TotalItems = machineData.Count();    
+        }
+        else
+        {
+            data.Items = [];
+            data.TotalItems = 0;
+        }
+        return data;
+    }
+
     private async Task EditMachine(MachineModel model)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model } };
         var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
         var result = await dialog.Result;
-        if(!result.Cancelled) {
+        if(!result.Canceled) {
             await DataUpdate.InvokeAsync();
         }
     }
@@ -89,19 +122,12 @@
     {
         try
         {
-            var response = await ApiClient.DeleteAsync($"machines/{model.Id}");
-            if (response.IsSuccessStatusCode)
-            {
-                await DataUpdate.InvokeAsync();
-            }
-            else
-            {
-                Log.Error("Encountered error: " + response.StatusCode.ToString());
-            }
+            await ApiClient.DeleteAsync($"machines/{model.Id}");
+            await DataUpdate.InvokeAsync();
         }
         catch (Exception ex)
         {
-            Log.Error(ex.Message);
+            Log.Error(ex, "Encountered error when attempting to delete machine");
         }
     }
 }

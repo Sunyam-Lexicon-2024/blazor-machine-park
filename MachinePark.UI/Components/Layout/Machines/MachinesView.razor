@@ -5,11 +5,10 @@
 
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MachineStatsDisplay Stats=@MachineStats ApiState=@ApiState />
-    <MachineDataGrid Machines=@Machines DataUpdate="@(() => OnDataUpdate())" ApiState=@ApiState />
+    <MachineDataGrid DataUpdate="@(() => OnDataUpdate())" ApiState=@ApiState />
 </MudContainer>
 
 @code {
-    public IEnumerable<MachineModel>? Machines { get; set; }
     public MachineStatsModel? MachineStats { get; set; }
 
     private ApiState ApiState { get; set; }
@@ -28,13 +27,12 @@
     {
         try
         {
-            Machines = await ApiClient.GetFromJsonAsync<IEnumerable<MachineModel>>("machines/get-all-machines");
             MachineStats = await ApiClient.GetFromJsonAsync<MachineStatsModel>("machines/stats/get-machine-stats");
             ApiState = ApiState.Reachable;
         }
         catch (Exception ex)
         {
-            Log.Error("{Message}", new { Message = "Could not get data from API", Error = ex });
+            Log.Error(ex, "Could not get machine data from API.");
             ApiState = ApiState.Unreachable;
         }
     }
