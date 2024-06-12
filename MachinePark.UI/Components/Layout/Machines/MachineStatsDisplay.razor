@@ -1,21 +1,23 @@
+@inject HttpClient ApiClient
+
 <MudContainer>
-    <Element Class="mb-5 d-flex align-center ">
+    <MudElement Class="mb-5 d-flex align-center ">
         <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.Analytics"></MudIcon>
         <h2>Machine Stats</h2>
-    </Element>
+    </MudElement>
     <MudPaper>
         <MudCard>
             @if (Stats is not null)
             {
                 <MudCardContent>
-                <MudText class="ma-2"><strong>Machine Count</strong></MudText>
-                <MudText class="ma-2">@Stats.MachineCount</MudText>
-                <MudText class="ma-2"><strong>Online Count</strong></MudText>
-                <MudText class="ma-2">@Stats.OnlineCount</MudText>
-                <MudText class="ma-2"><strong>Offline Count</strong></MudText>
-                <MudText class="ma-2">@Stats.OfflineCount</MudText>
-                <MudText class="ma-2"><strong>Total Wattage (kWh)</strong></MudText>
-                <MudText class="ma-2">@Stats.TotalWattage</MudText>
+                    <MudText class="ma-2"><strong>Machine Count</strong></MudText>
+                    <MudText class="ma-2">@Stats.MachineCount</MudText>
+                    <MudText class="ma-2"><strong>Online Count</strong></MudText>
+                    <MudText class="ma-2">@Stats.OnlineCount</MudText>
+                    <MudText class="ma-2"><strong>Offline Count</strong></MudText>
+                    <MudText class="ma-2">@Stats.OfflineCount</MudText>
+                    <MudText class="ma-2"><strong>Total Wattage (kWh)</strong></MudText>
+                    <MudText class="ma-2">@Stats.TotalWattage</MudText>
                 </MudCardContent>
                 <MudDivider />
                 <MudCardHeader>
@@ -23,10 +25,10 @@
                     <MudText><strong>Last Updated Machine</strong></MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                <MudText class="ma-2"><strong>ID</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Id</MudText>
-                <MudText class="ma-2"><strong>Name</strong></MudText>
-                <MudText class="ma-2">@Stats.LastUpdated.Name</MudText>
+                    <MudText class="ma-2"><strong>ID</strong></MudText>
+                    <MudText class="ma-2">@Stats.LastUpdated!.Id</MudText>
+                    <MudText class="ma-2"><strong>Name</strong></MudText>
+                    <MudText class="ma-2">@Stats.LastUpdated!.Name</MudText>
                 </MudCardContent>
             }
             else
@@ -44,12 +46,29 @@
     </MudPaper>
 </MudContainer>
 
-    @code {
+@code {
 
     [Parameter]
     public ApiState ApiState { get; set; }
-
-    [Parameter]
+    
     public MachineStatsModel? Stats { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    public async Task FetchData()
+    {
+        try
+        {
+            Stats = await ApiClient.GetFromJsonAsync<MachineStatsModel>("machines/stats/get-machine-stats");
+            ApiState = ApiState.Reachable;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Could not get machine data from API.");
+            ApiState = ApiState.Unreachable;
+        }
+    }
 }

@@ -1,39 +1,17 @@
 @using System.Net.Http
 @using System.Text.Json
 
-@inject HttpClient ApiClient
-
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
-    <MachineStatsDisplay Stats=@MachineStats ApiState=@ApiState />
-    <MachineDataGrid/>
+    <MachineStatsDisplay ref="@_statsDisplay" />
+    <MachineDataGrid DataUpdated="@(() => OnDataUpdated())" />
 </MudContainer>
 
 @code {
-    public MachineStatsModel? MachineStats { get; set; }
 
-    private ApiState ApiState { get; set; }
+    protected MachineStatsDisplay? _statsDisplay;
 
-    protected override async Task OnInitializedAsync()
+    private async Task OnDataUpdated()
     {
-        await FetchData();
-    }
-
-    private async Task OnDataUpdate()
-    {
-        await FetchData();
-    }
-
-    private async Task FetchData()
-    {
-        try
-        {
-            MachineStats = await ApiClient.GetFromJsonAsync<MachineStatsModel>("machines/stats/get-machine-stats");
-            ApiState = ApiState.Reachable;
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Could not get machine data from API.");
-            ApiState = ApiState.Unreachable;
-        }
+        await _statsDisplay!.FetchData();
     }
 }

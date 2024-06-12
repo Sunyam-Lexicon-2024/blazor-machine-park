@@ -33,10 +33,13 @@
     public EventCallback<int> DataSetSizeChange { get; set; }
     
     [Parameter]
-    public EventCallback<string?> SearchEntered { get; set; }
+    public EventCallback<string?> SearchInitiated { get; set; }
+    
+    [Parameter]
+    public EventCallback MachineAdded { get; set; }    
 
     private async Task Search() {
-        await SearchEntered.InvokeAsync(_searchInput?.Value);
+        await SearchInitiated.InvokeAsync(_searchInput?.Value);
     }
 
     private async Task SetDataSize(int size)
@@ -49,5 +52,8 @@
     {
         var dialog = await DialogService.ShowAsync<AddMachineDialog>();
         var result = await dialog.Result;
+        if(!result.Canceled) {
+            await MachineAdded.InvokeAsync();
+        }
     }
 }

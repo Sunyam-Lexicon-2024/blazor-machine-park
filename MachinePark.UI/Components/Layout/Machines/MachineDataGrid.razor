@@ -19,7 +19,11 @@
                     ShowMenuIcon="true"
                 >
                     <ToolBarContent>
-                        <MachineToolBar DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))" SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))" />
+                        <MachineToolBar
+                            DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))" 
+                            SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))" 
+                            MachineAdded="@(() => OnMachineAdded())"
+                            />
                         <MudSpacer/>
                     </ToolBarContent>
                     <Columns>
@@ -64,6 +68,9 @@
 
 @code {
 
+    [Parameter]
+    public EventCallback DataUpdated {get;set;}
+
     private string SortInfo = string.Empty;
 
     private MudDataGrid<MachineModel>? _dataGrid { get; set;}
@@ -101,13 +108,22 @@
 
         MachineData? machineData;
 
-        string queryURL = "machines/get-all-machines";
+        var queryString = CompileQueryString(state);
+
+        machineData = await ApiClient.GetFromJsonAsync<MachineData>(queryString);
         
+        return machineData;
+    }
+
+    private string CompileQueryString(GridState<MachineModel> state) {
+
+        string queryString = "machines/get-all-machines";
+
         if(_dataSetSize == 0) {
-            queryURL += $"?Page={state.Page}&PageSize={state.PageSize}&SetSize={_dataSetSize}";
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}&SetSize={_dataSetSize}";
         }
         else {
-            queryURL += $"?Page={state.Page}&PageSize={state.PageSize}";
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}";
         }
 
         if (state.SortDefinitions.Any()) {
@@ -117,17 +133,15 @@
                 var isGuid = Guid.TryParse(def.SortBy, out _);
                 var sortBy = isGuid? def.SortFunc(new MachineModel()).ToString() : def.SortBy;
                 var sortDirection = def.Descending ? "Descending" : "Ascending";
-                queryURL += $"&SortBy={sortBy}&SortDirection={sortDirection}";
+                queryString += $"&SortBy={sortBy}&SortDirection={sortDirection}";
             }
         }
 
         if(!string.IsNullOrWhiteSpace(_searchTerm)) {
-            queryURL += $"Search={_searchTerm}";
+            queryString += $"Search={_searchTerm}";
         }
 
-        machineData = await ApiClient.GetFromJsonAsync<MachineData>(queryURL);
-        
-        return machineData;
+        return queryString;
     }
 
     private async Task OnSearchInitiated(string? searchTerm) {
@@ -137,6 +151,11 @@
 
     private async Task OnDataSetSizeChange(int newSetSize){
         _dataSetSize = newSetSize;
+        await _dataGrid!.ReloadServerData();
+    }
+
+    private async Task OnMachineAdded() {
+        await DataUpdated.InvokeAsync();
         await _dataGrid!.ReloadServerData();
     }
 
