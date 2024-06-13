@@ -7,3 +7,5 @@ global using FastEndpoints;
 global using FastEndpoints.Swagger;
 global using Serilog;
 global using Microsoft.AspNetCore.Http.HttpResults;
+global using MachinePark.API.Extensions;
+global using MachinePark.Core.Events;
