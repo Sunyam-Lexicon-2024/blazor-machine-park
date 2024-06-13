@@ -1,0 +1,170 @@
+@inject HttpClient ApiClient
+@inject IDialogService DialogService
+@inject IConfiguration Configuration
+
+<h3 Class="ma-2">Client Data</h3>
+<MudDivider />
+<MudDataGrid T="MachineModel" Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container"
+    DragDropColumnReordering="true" RowsPerPage="5" ShowMenuIcon="true" Filterable="true" QuickFilter="@QuickFilter">
+    <ToolBarContent>
+        <CascadingValue Value="@SearchTerm">
+            <MachineToolBar DataModeChange="@OnDataModeChange"
+                DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))"
+                MachineAdded="@(() => OnMachineAdded())" />
+            <MudSpacer />
+        </CascadingValue>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="m => m.Id" />
+        <PropertyColumn Property="m => m.Name" />
+        <TemplateColumn Title="Status" SortBy="m => m.Online">
+            <CellTemplate>
+                @if (context.Item.Online)
+                {
+                    <MudElement>
+                        <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.OfflineBolt" />
+                    </MudElement>
+                }
+                else
+                {
+                    <MudElement>
+                        <MudIcon Color="@Color.Error" Icon="@Icons.Material.Filled.OfflineBolt" />
+                    </MudElement>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="m => m.Section" />
+        <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
+        <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
+        <TemplateColumn T="MachineModel" Sortable="false" DragAndDropEnabled="false" Filterable="false">
+            <CellTemplate>
+                <MudTooltip Text="Delete Machine">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete machine"
+                        OnClick="@(() => DeleteMachine(context.Item))" />
+                </MudTooltip>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn T="MachineModel" Sortable="false" DragAndDropEnabled="false" Filterable="false">
+            <CellTemplate>
+                <MudTooltip Text="Edit Machine">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit machine"
+                        OnClick="@(() => EditMachine(context.Item))" />
+                </MudTooltip>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <NoRecordsContent>
+        <MudElement Class="d-flex justify-center">
+            @if (ApiState == ApiState.Unreachable)
+            {
+                <MudAlert Severity="Severity.Error">API Unreachable</MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info">No data available</MudAlert>
+            }
+        </MudElement>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
+    </PagerContent>
+</MudDataGrid>
+
+@code
+{
+
+    public IEnumerable<MachineModel> Machines { get; set; } = [];
+    private int _dataSetSize = 100;
+    private string? _getAllURI;
+    private string SortInfo = string.Empty;
+    private ApiState ApiState;
+
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback DataModeChange { get; set; }
+
+    [Parameter]
+    public EventCallback DataUpdate { get; set; }
+
+    private async Task OnDataModeChange()
+    {
+        await DataModeChange.InvokeAsync();
+    }
+
+    private bool QuickFilter(MachineModel model)
+    {
+        bool match = false;
+
+        if (string.IsNullOrWhiteSpace(SearchTerm))
+        {
+            match = true;
+        }
+
+        if (model.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        {
+            match = true;
+        }
+
+        if ($"{model.Id} {model.Section} {model.Wattage}".Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        {
+            match = true;
+        }
+
+        return match;
+    }
+
+    private async Task<MachineData?> FetchData()
+    {
+        return await ApiClient.GetFromJsonAsync<MachineData>($"{_getAllURI}?SetSize={_dataSetSize}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _getAllURI = Configuration["API:GetAllURI:Client"];
+        try
+        {
+            var machineData = await FetchData();
+            if (machineData is not null)
+            {
+                Machines = machineData!.Machines!;
+                ApiState = ApiState.Reachable;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error encountered contacting API");
+            ApiState = ApiState.Unreachable;
+        }
+    }
+
+    private void OnDataSetSizeChange(int newSetSize)
+    {
+        _dataSetSize = newSetSize;
+    }
+
+    private async Task OnMachineAdded()
+    {
+        await DataUpdate.InvokeAsync();
+    }
+
+    private async Task EditMachine(MachineModel model)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model }, { d => d.UpdateURI, Configuration["API:UpdateURI"]  } };
+        var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
+        var result = await dialog.Result;
+    }
+
+    private async Task DeleteMachine(MachineModel model)
+    {
+        try
+        {
+            await ApiClient.DeleteAsync($"machines/{model.Id}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Encountered error when attempting to delete machine");
+        }
+    }
+}

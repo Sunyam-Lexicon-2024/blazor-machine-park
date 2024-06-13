@@ -1,0 +1,193 @@
+@inject HttpClient ApiClient
+@inject IDialogService DialogService
+@inject IConfiguration Configuration
+
+<h3 Class="ma-2">Server Data</h3>
+<MudDivider />
+<MudDataGrid @ref="_dataGrid" T="MachineModel" ServerData="LoadData" Hover="true"
+    ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true" RowsPerPage="5" ShowMenuIcon="true">
+    <ToolBarContent>
+        <CascadingValue Value="@SearchTerm">
+            <MachineToolBar DataModeChange="@OnDataModeChange"
+                DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))"
+                SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))"
+                MachineAdded="@(() => OnMachineAdded())" />
+            <MudSpacer />
+        </CascadingValue>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="m => m.Id" />
+        <PropertyColumn Property="m => m.Name" />
+        <TemplateColumn Title="Status" SortBy="@((_) => nameof(MachineModel.Online))">
+            <CellTemplate>
+                @if (context.Item.Online)
+                {
+                    <MudElement>
+                        <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.OfflineBolt" />
+                    </MudElement>
+                }
+                else
+                {
+                    <MudElement>
+                        <MudIcon Color="@Color.Error" Icon="@Icons.Material.Filled.OfflineBolt" />
+                    </MudElement>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="m => m.Section" />
+        <PropertyColumn Property="m => m.CreatedAt" Title="Created At" />
+        <PropertyColumn Property="m => m.UpdatedAt" Title="Updated At" />
+        <TemplateColumn T="MachineModel" Sortable="false" DragAndDropEnabled="false" Filterable="false">
+            <CellTemplate>
+                <MudTooltip Text="Delete Machine">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete machine"
+                        OnClick="@(() => DeleteMachine(context.Item))" />
+                </MudTooltip>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn T="MachineModel" Sortable="false" DragAndDropEnabled="false" Filterable="false">
+            <CellTemplate>
+                <MudTooltip Text="Edit Machine">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit machine"
+                        OnClick="@(() => EditMachine(context.Item))" />
+                </MudTooltip>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="MachineModel" PageSizeOptions=@(new int[] {5, 10, 20}) />
+    </PagerContent>
+</MudDataGrid>
+
+@code
+{
+
+    private int _dataSetSize = 100;
+    private MudDataGrid<MachineModel>? _dataGrid;
+    private string? _getAllURI;
+    private string SortInfo = string.Empty;
+
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback DataUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback DataModeChange { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _getAllURI = Configuration["API:GetAllURI:Server"];
+    }
+
+    private async Task<GridData<MachineModel>> LoadData(GridState<MachineModel> state)
+    {
+        GridData<MachineModel> data = new();
+
+        MachineData? machineData = await FetchData(state);
+
+        if (machineData is not null && machineData.Machines!.Any())
+        {
+            data.Items = machineData.Machines!.Take(_dataGrid!.RowsPerPage);
+            data.TotalItems = machineData.SetSize;
+        }
+        else
+        {
+            data.Items = [];
+            data.TotalItems = 0;
+        }
+
+        return data;
+    }
+
+    private async Task<MachineData?> FetchData(GridState<MachineModel> state)
+    {
+        MachineData? machineData;
+
+        var queryString = CompileQueryString(state);
+
+        machineData = await ApiClient.GetFromJsonAsync<MachineData>(queryString);
+
+        return machineData;
+    }
+
+    private string CompileQueryString(GridState<MachineModel> state)
+    {
+        var queryString = _getAllURI;
+
+        if (_dataSetSize == 0)
+        {
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}&SetSize={_dataSetSize}";
+        }
+        else
+        {
+            queryString += $"?Page={state.Page}&PageSize={state.PageSize}";
+        }
+
+        if (state.SortDefinitions.Any())
+        {
+            // TBD Allow for multisort
+            foreach (var def in state.SortDefinitions)
+            {
+                var isGuid = Guid.TryParse(def.SortBy, out _);
+                var sortBy = isGuid ? def.SortFunc(new MachineModel()).ToString() : def.SortBy;
+                var sortDirection = def.Descending ? "Descending" : "Ascending";
+                queryString += $"&SortBy={sortBy}&SortDirection={sortDirection}";
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchTerm))
+        {
+            queryString += $"&Search={SearchTerm}";
+        }
+
+        return queryString;
+    }
+
+    private async Task OnDataModeChange()
+    {
+        await DataModeChange.InvokeAsync();
+    }
+
+    private async Task OnSearchInitiated(string? searchTerm)
+    {
+        SearchTerm = searchTerm;
+        await _dataGrid!.ReloadServerData();
+    }
+
+    private async Task OnDataSetSizeChange(int newSetSize)
+    {
+        _dataSetSize = newSetSize;
+        await _dataGrid!.ReloadServerData();
+    }
+
+    private async Task OnMachineAdded()
+    {
+        await DataUpdate.InvokeAsync();
+        await _dataGrid!.ReloadServerData();
+    }
+
+    private async Task EditMachine(MachineModel model)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model } };
+        var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DataUpdate.InvokeAsync();
+        }
+    }
+
+    private async Task DeleteMachine(MachineModel model)
+    {
+        try
+        {
+            await ApiClient.DeleteAsync($"machines/{model.Id}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Encountered error when attempting to delete machine");
+        }
+    }
+}
