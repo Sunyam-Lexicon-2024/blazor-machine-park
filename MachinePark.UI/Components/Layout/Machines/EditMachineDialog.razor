@@ -11,36 +11,28 @@
         </MudText>
     </TitleContent>
     <DialogActions>
-        <MudPaper>
-            <MudForm Model="@FormModel" @ref="_form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudInputControl>
-                    <MudTextField @bind-Value="@FormModel!.Name" T="string" Label="Name" Required="true"
-                        RequiredError="A Machine name is required!" />
-                </MudInputControl>
-                <MudInputControl>
-                    <MudSlider @bind-Value="@FormModel!.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
-                        Wattage (@FormModel!Wattage) kWh
-                    </MudSlider>
-                </MudInputControl>
-                <MudInputControl>
-                    <MudNumericField @bind-Value="@FormModel!.Section" T="int" Label="Section" Min="1" Max="100" />
-                </MudInputControl>
-                <MudInputControl>
-                    <MudCheckBox @bind-Value="@FormModel!.Online" T="bool" Label="Online" />
-                </MudInputControl>
-                <MudInputControl Class="d-flex flex-row">
-                    <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Save Changes
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="@Color.Default" OnClick="Cancel">Cancel
-                    </MudButton>
-                </MudInputControl>
-            </MudForm>
-        </MudPaper>
+        <MudForm Model="@FormModel" @ref="_form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudInputControl Class="pa-2 ma-2">
+                <MudTextField @bind-Value="@FormModel!.Name" T="string" Label="Name" Required="true"
+                    RequiredError="A Machine name is required!" />
+                <MudSlider @bind-Value="@FormModel!.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+                    Wattage (@FormModel!.Wattage) kWh
+                </MudSlider>
+                <MudNumericField @bind-Value="@FormModel!.Section" T="int" Label="Section" Min="1" Max="100" />
+                <MudCheckBox @bind-Value="@FormModel!.Online" T="bool" Label="Online" />
+            </MudInputControl>
+            <MudInputControl Class="d-flex flex-row">
+                <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Save
+                    Changes
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="@Color.Default" OnClick="Cancel">Cancel
+                </MudButton>
+            </MudInputControl>
+        </MudForm>
     </DialogActions>
-
-        <DialogContent>
-    @if (apiErrorResponse is not null)
-    {
+    <DialogContent>
+        @if (apiErrorResponse is not null)
+        {
             <MudText class="mt-3" Color="@Color.Error">@apiErrorResponse.Message</MudText>
             @if (apiErrorResponse.Errors is not null)
             {
@@ -57,21 +49,30 @@
             {
                 <MudText Color="@Color.Error">@apiErrorResponse.Message</MudText>
             }
-    }
-        </DialogContent>
+        }
+    </DialogContent>
 </MudDialog>
 
-@code {
-    [CascadingParameter] 
-    MudDialogInstance? MudDialog { get; set; }
-    bool success;
-    public APIErrorResponseModel? apiErrorResponse { get; set; }
-    string[] errors = { };
+@code
+{
+
+    private bool success;
+    private APIErrorResponseModel? apiErrorResponse { get; set; }
+    private string[] errors = { };
     private MudForm? _form;
+
+    [CascadingParameter]
+    MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public string? UpdateURI { get; set; }
+
     [Parameter]
     public MachineModel? FormModel { get; set; }
+
     [Parameter]
     public EventCallback FormClosed { get; set; }
+
     [Parameter]
     public EventCallback FormSubmitted { get; set; }
 
@@ -83,10 +84,11 @@
 
         if (success)
         {
-            var response = await ApiClient.PutAsJsonAsync("machines/update-machine", FormModel);
+            var response = await ApiClient.PutAsJsonAsync(UpdateURI, FormModel);
             await SetAPIResponse(response);
         }
     }
+    
     private async Task SetAPIResponse(HttpResponseMessage response)
     {
         if ((int)response.StatusCode == StatusCodes.Status400BadRequest)

@@ -11,29 +11,24 @@
         </MudText>
     </TitleContent>
     <DialogActions>
-            <MudForm Model="@FormModel" @ref="_form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudInputControl>
-                    <MudTextField @bind-Value="@FormModel!.Name" T="string" Label="Name" Required="true"
-                        RequiredError="A Machine name is required!" />
-                </MudInputControl>
-                <MudInputControl>
-                    <MudSlider @bind-Value="@FormModel!.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
-                        Wattage (@FormModel.Wattage) kWh
-                    </MudSlider>
-                </MudInputControl>
-                <MudInputControl>
-                    <MudNumericField @bind-Value="@FormModel!.Section" T="int" Label="Section" Min="1" Max="100" />
-                </MudInputControl>
-                <MudInputControl>
-                    <MudCheckBox @bind-Value="@FormModel!.Online" T="bool" Label="Online" />
-                </MudInputControl>
-                <MudInputControl Class="d-flex flex-row">
-                    <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Create Machine
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="@Color.Default" OnClick="Cancel">Cancel
-                    </MudButton>
-                </MudInputControl>
-            </MudForm>
+        <MudForm Model="@_formModel" @ref="_form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudInputControl Class="pa-2 ma-2">
+                <MudTextField @bind-Value="@_formModel!.Name" T="string" Label="Name" Required="true"
+                    RequiredError="A Machine name is required!" />
+                <MudSlider @bind-Value="@_formModel!.Wattage" Variant="Variant.Filled" T="double" Min="10" Max="1000">
+                    Wattage (@_formModel.Wattage) kWh
+                </MudSlider>
+                <MudNumericField @bind-Value="@_formModel!.Section" T="int" Label="Section" Min="1" Max="100" />
+                <MudCheckBox @bind-Value="@_formModel!.Online" T="bool" Label="Online" />
+            </MudInputControl>
+            <MudInputControl Class="d-flex flex-row">
+                <MudButton Class="mr-2" Variant="Variant.Filled" Color="@Color.Primary" OnClick="@SubmitForm">Create
+                    Machine
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="@Color.Default" OnClick="Cancel">Cancel
+                </MudButton>
+            </MudInputControl>
+        </MudForm>
     </DialogActions>
     <DialogContent>
         @if (apiErrorResponse is not null)
@@ -58,21 +53,25 @@
     </DialogContent>
 </MudDialog>
 
-@code {
-        
-    [CascadingParameter] 
+@code
+{
+
+    private bool success;
+    private APIErrorResponseModel? apiErrorResponse { get; set; }
+    private APISuccessResponseModel? apiSuccessResponse { get; set; }
+    private string[] errors = { };
+    private MudForm? _form;
+    private MachineModel? _formModel;
+
+    [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
-    bool success;
-    public APIErrorResponseModel? apiErrorResponse { get; set; }
-    public APISuccessResponseModel? apiSuccessResponse { get; set; }
-    string[] errors = { };
-    private MudForm? _form;
-    public MachineModel? FormModel { get; set; }
+    [Parameter]
+    public string? AddURI { get; set; }
 
     protected override void OnInitialized()
     {
-        FormModel = new();
+        _formModel = new();
     }
 
     private void Cancel() => MudDialog!.Cancel();
@@ -83,7 +82,7 @@
 
         if (success)
         {
-            var response = await ApiClient.PostAsJsonAsync("machines/add-machine", FormModel);
+            var response = await ApiClient.PostAsJsonAsync(AddURI, _formModel);
             await SetAPIResponse(response);
         }
     }
@@ -99,7 +98,7 @@
         {
             apiSuccessResponse = JsonSerializer.Deserialize<APISuccessResponseModel>(await response.Content.ReadAsStringAsync());
             MudDialog!.Close(DialogResult.Ok(apiSuccessResponse!.Id));
-            Snackbar.Add($@"Machine ""{FormModel!.Name}"" created with ID [{apiSuccessResponse.Id}]", Severity.Success);
+            Snackbar.Add($@"Machine ""{_formModel!.Name}"" created with ID [{apiSuccessResponse.Id}]", Severity.Success);
         }
         else
         {
@@ -107,7 +106,7 @@
                 {
                     Message = "API not available; please try again later."
                 };
-                Snackbar.Add("Could not contact API", Severity.Error);
+            Snackbar.Add("Could not contact API", Severity.Error);
         }
     }
 }

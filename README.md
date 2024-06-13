@@ -214,6 +214,7 @@ If the application is run locally, make sure to mirror the MSSQL setup provided 
   - [x] (Server Side) Sorting
   - [x] (Server Side) Searching
   - [ ] (Server Side) Filtering
+  - [x] Client/Server data source interactive toggle 
   - [ ] Server Sent Events 
   - [ ] OAuth2/OIDC
   - [ ] Testing
