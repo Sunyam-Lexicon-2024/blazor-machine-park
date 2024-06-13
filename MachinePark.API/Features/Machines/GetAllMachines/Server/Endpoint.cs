@@ -1,9 +1,8 @@
 namespace Machines.GetAllMachines.Server;
 
-public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
+public class Endpoint : Endpoint<Request, Results<Ok<Response>,
                                            NoContent>, Mapper>
 {
-
     public IMachineService MachineService { get; set; }
 
     public override void Configure()
