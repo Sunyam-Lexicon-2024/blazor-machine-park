@@ -1,4 +1,5 @@
 @inject HttpClient ApiClient
+@inject IConfiguration Configuration
 
 <MudContainer>
     <MudElement Class="mb-5 d-flex align-center ">
@@ -62,7 +63,7 @@
     {
         try
         {
-            Stats = await ApiClient.GetFromJsonAsync<MachineStatsModel>("machines/stats/get-machine-stats");
+            Stats = await ApiClient.GetFromJsonAsync<MachineStatsModel>(Configuration["API:StatsURI"]);
             ApiState = ApiState.Reachable;
         }
         catch (Exception ex)

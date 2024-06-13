@@ -1,0 +1,42 @@
+@inject HttpClient ApiClient
+@inject IDialogService DialogService
+
+<MudContainer Class="d-flex flex-column mb-5" MaxWidth="MaxWidth.ExtraExtraLarge">
+    <MudElement HtmlTag="div" Class="mb-5 d-flex align-center ">
+        <MudIcon Class="mr-2" Icon="@Icons.Material.Filled.TableView" />
+        <h2>Machines</h2>
+    </MudElement>
+    <MudPaper Elevation="25">
+        <CascadingValue Value="@ServerDataMode">
+            @if (ServerDataMode)
+            {
+                <MachineServerDataGrid DataModeChange="@OnDataModeChange" DataUpdate="@OnDataUpdated" />
+            }
+            else
+            {
+                <MachineClientDataGrid DataModeChange="@OnDataModeChange" DataUpdate="@OnDataUpdated" />
+            }
+        </CascadingValue>
+    </MudPaper>
+</MudContainer>
+
+@code
+{
+
+    private MudDataGrid<MachineModel>? _dataGrid { get; set; }
+    public bool ServerDataMode { get; set; } = false;
+
+    [Parameter]
+    public EventCallback DataUpdated { get; set; }
+
+    private async Task OnDataUpdated()
+    {
+        await DataUpdated.InvokeAsync();
+    }
+
+    private void OnDataModeChange()
+    {
+        ServerDataMode = !ServerDataMode;
+    }
+
+}

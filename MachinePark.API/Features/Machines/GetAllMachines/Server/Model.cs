@@ -1,4 +1,4 @@
-namespace Machines.GetAllMachines;
+namespace Machines.GetAllMachines.Server;
 
 public class Request
 {

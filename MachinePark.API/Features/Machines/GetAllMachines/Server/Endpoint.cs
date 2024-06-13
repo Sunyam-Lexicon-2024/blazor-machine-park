@@ -1,4 +1,4 @@
-namespace Machines.GetAllMachines;
+namespace Machines.GetAllMachines.Server;
 
 public class Endpoint : Endpoint<Request, Results<Ok<Response>,
                                            NoContent>, Mapper>
@@ -7,7 +7,7 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>,
 
     public override void Configure()
     {
-        Get("/machines/get-all-machines");
+        Get("/machines/get-all-machines/server");
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)

@@ -1,6 +1,10 @@
 root = true
 
+[{*.cs}]
 # CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
-[{*.cs,*.razor}]
 dotnet_diagnostic.CS8618.severity = none
+# CS8602: TBD
 dotnet_diagnostic.CS8602.severity = none
+# RZ100112: TBD
+[{*.razor}]
+dotnet_diagnostic.RZ10012.severity = none
