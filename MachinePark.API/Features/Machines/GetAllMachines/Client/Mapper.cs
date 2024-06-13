@@ -1,4 +1,4 @@
-namespace Machines.GetAllMachines;
+namespace Machines.GetAllMachines.Client;
 
 public class Mapper : ResponseMapper<MachineModel, Machine>
 {

@@ -1,4 +1,4 @@
-namespace Machines.GetAllMachines;
+namespace Machines.GetAllMachines.Client;
 
 public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
                                            NoContent>, Mapper>
@@ -8,7 +8,8 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
 
     public override void Configure()
     {
-        Get("/machines/get-all-machines");
+        Get("/machines/get-all-machines/client");
+        ResponseCache(60);
         Description(d => d
         .Produces<IEnumerable<MachineModel>>(200, "application/json+custom")
         .Produces(204)
@@ -28,11 +29,7 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
         {
             QueryParams queryParams = new()
             {
-                SearchTerm = req.Search,
-                Page = req.Page,
-                PageSize = req.PageSize,
-                SortProp = !string.IsNullOrWhiteSpace(req.SortBy) ? Enum.Parse<SortProp>(req.SortBy) : null,
-                SortDirection = !string.IsNullOrWhiteSpace(req.SortDirection) ? Enum.Parse<SortDirection>(req.SortDirection) : null
+                SetSize = req.SetSize
             };
 
             machines = await MachineService.GetAllMachinesAsync(queryParams);
@@ -47,8 +44,7 @@ public sealed class Endpoint : Endpoint<Request, Results<Ok<Response>,
         {
             Response response = new()
             {
-                Machines = machines.Select(Map.FromEntity),
-                SetSize = MachineService.GetDataSetCount(req.SetSize)
+                Machines = machines.Select(Map.FromEntity)
             };
 
             return TypedResults.Ok(response);
