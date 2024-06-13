@@ -31,6 +31,13 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, BadRequest>, Map
         var createdMachine = await MachineService.AddAsync(machineToCreate);
         await MachineService.SaveChangesAsync();
 
+        new MachineDataUpdated
+        {
+            Id = 1,
+            Description = $"Machine data updated with new machine [{createdMachine.Id}]"
+        }
+        .Broadcast(ct: ct);
+
         Response response = Map.FromEntity(createdMachine!);
         return TypedResults.Ok(response);
     }
