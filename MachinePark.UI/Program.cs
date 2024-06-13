@@ -1,5 +1,8 @@
+using FastEndpoints;
 using MachinePark.UI.Components;
+using MachinePark.UI.EventHanders;
 using MachinePark.UI.Extensions;
+using MachinePark.Core.Events;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -20,6 +23,10 @@ try
         app.UseExceptionHandler("/Error", createScopeForErrors: true);
         app.UseHsts();
     }
+
+    app.MapRemote(builder.Configuration["API:EventsURI"]!, c => {
+        c.Subscribe<MachineDataUpdated, OnMachineDataUpdated>();
+    });
 
     app.UseHttpsRedirection();
 
