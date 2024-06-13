@@ -1,7 +1,4 @@
-using MachinePark.Core.Entities;
 using MachinePark.Data.Contexts;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace MachinePark.Data.Seeds;
 
@@ -11,7 +8,7 @@ public class MachineSeeds(MachineParkDbContext context)
     private readonly MachineParkDbContext _context = context;
     private readonly Random _rnd = new();
 
-    private List<Machine> _machines = [];
+    private readonly List<Machine> _machines = [];
 
     public async Task InitAsync()
     {
@@ -33,7 +30,7 @@ public class MachineSeeds(MachineParkDbContext context)
 
     private void GenerateMachines(int count)
     {
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             Machine machineToAdd = new()
             {
