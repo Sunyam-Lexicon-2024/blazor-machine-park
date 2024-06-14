@@ -1,6 +1,10 @@
 root = true
 
+[{*.cs}]
 # CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
-[{*.cs,*.razor}]
 dotnet_diagnostic.CS8618.severity = none
+# CS8602: TBD
 dotnet_diagnostic.CS8602.severity = none
+# Namespace does not match folder structure (IDE0130)
+[*.{cs,vb}]
+dotnet_diagnostic.IDE0130.severity = none
