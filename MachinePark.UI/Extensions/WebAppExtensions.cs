@@ -1,42 +1,33 @@
-using Serilog;
-using MudBlazor;
-using MudBlazor.Services;
+using MachinePark.UI.EventHanders;
+using FastEndpoints;
+using MachinePark.Core.Events;
+using MachinePark.UI.Components;
 
 namespace MachinePark.UI.Extensions;
 
 public static class WebAppExtensions
 {
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration config)
+    public static WebApplication ConfigureApplication(this WebApplication app)
     {
-        services.AddMudServices(config => {
-            config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error", createScopeForErrors: true);
+            app.UseHsts();
+        }
 
-            config.SnackbarConfiguration.PreventDuplicates = false;
-            config.SnackbarConfiguration.NewestOnTop = false;
-            config.SnackbarConfiguration.ShowCloseIcon = true;
-            config.SnackbarConfiguration.VisibleStateDuration = 10000;
-            config.SnackbarConfiguration.HideTransitionDuration = 500;
-            config.SnackbarConfiguration.ShowTransitionDuration = 500;
-            config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+        app.MapRemote(app.Configuration["API:EventsURI"]!, c =>
+        {
+            c.Subscribe<MachineDataUpdated, OnMachineDataUpdated>();
         });
 
-        services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+        app.UseHttpsRedirection();
 
-        services.AddScoped(sp =>
-            new HttpClient
-            {
-                BaseAddress = new Uri(config["API:BaseURI"]!)
-                ?? throw new ArgumentException("Could not get API URI from configuration"),
-                Timeout = TimeSpan.FromSeconds(30)
-            });
+        app.UseStaticFiles();
+        app.UseAntiforgery();
 
-        services.AddSerilog((services, loggerConfig) =>
-            loggerConfig.ReadFrom.Configuration(config)
-                .ReadFrom.Services(services)
-                .Enrich.FromLogContext()
-                .WriteTo.Console());
+        app.MapRazorComponents<App>()
+            .AddInteractiveServerRenderMode();
 
-        return services;
+        return app;
     }
 }

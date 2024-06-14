@@ -6,7 +6,7 @@ namespace MachinePark.API.Extensions;
 public static class WebAppExtensions
 {
 
-    public static async Task<WebApplication> ConfigureWebApplication(this WebApplication app)
+    public static async Task<WebApplication> ConfigurebApplication(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {

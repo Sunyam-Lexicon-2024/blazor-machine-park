@@ -15,7 +15,7 @@ try
 
     builder.AddHandlerServer();
 
-    builder.Services.RegisterApplicationServices(builder.Configuration);
+    builder.Services.RegisterServices(builder.Configuration);
 
     var app = builder.Build();
 
@@ -24,7 +24,7 @@ try
         h.RegisterEventHub<MachineDataUpdated>();
     });
 
-    await app.ConfigureWebApplication();
+    await app.ConfigurebApplication();
 
     await app.RunAsync();
 
