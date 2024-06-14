@@ -8,7 +8,6 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
     {
         Delete("/machines/{MachineId}");
         Description(d => d
-            .Accepts<Request>()
             .Produces<Response>(200, "application/json")
             .Produces(404)
             .ProducesProblemFE<InternalErrorResponse>(500),
@@ -28,6 +27,13 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
             }
             else
             {
+                new MachineDataUpdated
+                {
+                    Id = 2,
+                    Description = $"Machine data updated with deleted machine [{deletedMachine.Id}]"
+                }
+                .Broadcast(ct: ct);
+
                 await MachineService.SaveChangesAsync();
                 return TypedResults.Ok<Response>(new() { MachineId = deletedMachine.Id });
             }
