@@ -4,14 +4,13 @@
 
 <h3 Class="ma-2">Server Data</h3>
 <MudDivider />
-<MudDataGrid @ref="_dataGrid" T="MachineModel" ServerData="LoadData" Hover="true"
+<MudDataGrid @ref="DataGrid" T="MachineModel" ServerData="LoadData" Hover="true"
     ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true" RowsPerPage="5" ShowMenuIcon="true">
     <ToolBarContent>
         <CascadingValue Value="@SearchTerm">
             <MachineToolBar DataModeChange="@OnDataModeChange"
                 DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))"
-                SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))"
-                MachineAdded="@(() => OnMachineAdded())" />
+                SearchInitiated="@((string? searchTerm) => OnSearchInitiated(searchTerm))" />
             <MudSpacer />
         </CascadingValue>
     </ToolBarContent>
@@ -63,14 +62,14 @@
 {
 
     private int _dataSetSize = 100;
-    private MudDataGrid<MachineModel>? _dataGrid;
     private string? _getAllURI;
     private string SortInfo = string.Empty;
 
-    public string SearchTerm { get; set; } = string.Empty;
+    [CascadingParameter]
+    public MachinesView? MachinesView { get; set; }
 
-    [Parameter]
-    public EventCallback DataUpdate { get; set; }
+    public MudDataGrid<MachineModel>? DataGrid { get; set; }
+    public string SearchTerm { get; set; } = string.Empty;
 
     [Parameter]
     public EventCallback DataModeChange { get; set; }
@@ -78,9 +77,10 @@
     protected override void OnInitialized()
     {
         _getAllURI = Configuration["API:GetAllURI:Server"];
+        DataGrid!.ReloadServerData();
     }
 
-    private async Task<GridData<MachineModel>> LoadData(GridState<MachineModel> state)
+    public async Task<GridData<MachineModel>> LoadData(GridState<MachineModel> state)
     {
         GridData<MachineModel> data = new();
 
@@ -88,7 +88,7 @@
 
         if (machineData is not null && machineData.Machines!.Any())
         {
-            data.Items = machineData.Machines!.Take(_dataGrid!.RowsPerPage);
+            data.Items = machineData.Machines!.Take(DataGrid!.RowsPerPage);
             data.TotalItems = machineData.SetSize;
         }
         else
@@ -152,19 +152,13 @@
     private async Task OnSearchInitiated(string? searchTerm)
     {
         SearchTerm = searchTerm;
-        await _dataGrid!.ReloadServerData();
+        await DataGrid!.ReloadServerData();
     }
 
     private async Task OnDataSetSizeChange(int newSetSize)
     {
         _dataSetSize = newSetSize;
-        await _dataGrid!.ReloadServerData();
-    }
-
-    private async Task OnMachineAdded()
-    {
-        await DataUpdate.InvokeAsync();
-        await _dataGrid!.ReloadServerData();
+        await DataGrid!.ReloadServerData();
     }
 
     private async Task EditMachine(MachineModel model)
@@ -173,10 +167,6 @@
         var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model } };
         var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
         var result = await dialog.Result;
-        if (!result.Canceled)
-        {
-            await DataUpdate.InvokeAsync();
-        }
     }
 
     private async Task DeleteMachine(MachineModel model)

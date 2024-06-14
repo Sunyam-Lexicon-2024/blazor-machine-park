@@ -1,8 +1,5 @@
-@using MachinePark.UI.EventHanders
-
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
-@inject OnMachineDataUpdated machineDataUpdated
 
 <MudContainer Class="d-flex flex-column mb-5" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MudElement HtmlTag="div" Class="mb-5 d-flex align-center ">
@@ -13,11 +10,11 @@
         <CascadingValue Value="@ServerDataMode">
             @if (ServerDataMode)
             {
-                <MachineServerDataGrid DataModeChange="@OnDataModeChange" DataUpdate="@OnDataUpdated" />
+                <MachineServerDataGrid DataModeChange="@OnDataModeChange" @ref="@_serverDataGrid" />
             }
             else
             {
-                <MachineClientDataGrid DataModeChange="@OnDataModeChange" DataUpdate="@OnDataUpdated" />
+                <MachineClientDataGrid DataModeChange="@OnDataModeChange" @ref="@_clientDataGrid" />
             }
         </CascadingValue>
     </MudPaper>
@@ -29,30 +26,23 @@
     private MudDataGrid<MachineModel>? _dataGrid { get; set; }
     public bool ServerDataMode { get; set; } = false;
 
-    [Parameter]
-    public EventCallback DataUpdated { get; set; }
+    private MachineClientDataGrid? _clientDataGrid;
+    private MachineServerDataGrid? _serverDataGrid;
 
-    protected override void OnInitialized() {
-        machineDataUpdated.OnChange += StateHasChanged;
-    }
-
-    private async Task OnDataUpdated()
+    public async Task FetchData()
     {
-        await DataUpdated.InvokeAsync();
+        if (_clientDataGrid is not null)
+        {
+            await _clientDataGrid.FetchData();
+        }
+        else if(_serverDataGrid is not null)
+        {
+            await Task.Run(() => _serverDataGrid.DataGrid?.ReloadServerData());
+        }
     }
 
     private void OnDataModeChange()
     {
         ServerDataMode = !ServerDataMode;
     }
-
-}    using MachinePark.UI.EventHanders;
-
-#line default
-#line hidden
-#nullable disable
-    using MachinePark.Core.Events;
-
-#line default
-#line hidden
-#nullable disable
+}
