@@ -7,5 +7,4 @@ public class APISuccessResponseModel
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
-
 }

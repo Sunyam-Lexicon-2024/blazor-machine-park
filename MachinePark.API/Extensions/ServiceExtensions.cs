@@ -1,9 +1,9 @@
 namespace MachinePark.API.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class ServiceExtensions
 {
 
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddFastEndpoints()

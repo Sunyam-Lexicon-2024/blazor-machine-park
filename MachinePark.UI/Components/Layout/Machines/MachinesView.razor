@@ -1,17 +1,39 @@
 @using System.Net.Http
 @using System.Text.Json
 
+@inject INotificationService NotificationService
+
+@implements IDisposable
+
 <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
-    <MachineStatsDisplay @ref="@_statsDisplay" />
-    <MachineDataDisplay DataUpdated="@(() => OnDataUpdated())" />
+    <CascadingValue Value="this">
+        <MachineStatsDisplay @ref="_statsDisplay" />
+        <MachineDataDisplay @ref="_dataDisplay" />
+    </CascadingValue>
 </MudContainer>
 
-@code {
+@code
+{
+    private MachineStatsDisplay? _statsDisplay;
+    private MachineDataDisplay? _dataDisplay;
 
-    protected MachineStatsDisplay? _statsDisplay;
-
-    private async Task OnDataUpdated()
+    protected override void OnInitialized()
     {
-        await _statsDisplay!.FetchData();
+        NotificationService.Notify += OnNotifyHandler;
+    }
+
+    public void Dispose()
+    {
+        NotificationService.Notify -= OnNotifyHandler;
+    }
+
+    public async void OnNotifyHandler()
+    {
+        await InvokeAsync(async () =>
+        {
+            await _dataDisplay?.FetchData();
+            await _statsDisplay?.FetchData();
+            StateHasChanged();
+        });
     }
 }

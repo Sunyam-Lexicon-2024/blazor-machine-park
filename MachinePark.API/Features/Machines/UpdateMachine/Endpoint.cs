@@ -29,6 +29,13 @@ public class Endpoint : Endpoint<Request, Results<Ok<Response>, NotFound, BadReq
             var updatedMachine = await MachineService.UpdateAsync(machineToUpdate);
             await MachineService.SaveChangesAsync();
 
+            new MachineDataUpdated
+            {
+                Id = 3,
+                Description = $"Machine data updated with updated machine [{updatedMachine.Id}]"
+            }
+            .Broadcast(ct: ct);
+
             return TypedResults.Ok(Map.FromEntity(updatedMachine!));
         }
     }

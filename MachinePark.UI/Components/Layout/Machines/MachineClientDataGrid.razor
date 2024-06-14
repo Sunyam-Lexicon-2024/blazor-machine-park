@@ -9,8 +9,7 @@
     <ToolBarContent>
         <CascadingValue Value="@SearchTerm">
             <MachineToolBar DataModeChange="@OnDataModeChange"
-                DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))"
-                MachineAdded="@(() => OnMachineAdded())" />
+                DataSetSizeChange="@((int setSize) => OnDataSetSizeChange(setSize))" />
             <MudSpacer />
         </CascadingValue>
     </ToolBarContent>
@@ -79,13 +78,14 @@
     private string SortInfo = string.Empty;
     private ApiState ApiState;
 
-    public string SearchTerm { get; set; } = string.Empty;
+    [CascadingParameter]
+    public MachinesView? MachinesView { get; set; }
 
     [Parameter]
     public EventCallback DataModeChange { get; set; }
 
-    [Parameter]
-    public EventCallback DataUpdate { get; set; }
+    public string SearchTerm { get; set; } = string.Empty;
+
 
     private async Task OnDataModeChange()
     {
@@ -114,7 +114,7 @@
         return match;
     }
 
-    private async Task<MachineData?> FetchData()
+    public async Task<MachineData?> FetchData()
     {
         return await ApiClient.GetFromJsonAsync<MachineData>($"{_getAllURI}?SetSize={_dataSetSize}");
     }
@@ -143,15 +143,15 @@
         _dataSetSize = newSetSize;
     }
 
-    private async Task OnMachineAdded()
-    {
-        await DataUpdate.InvokeAsync();
-    }
-
     private async Task EditMachine(MachineModel model)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var parameters = new DialogParameters<EditMachineDialog> { { d => d.FormModel, model }, { d => d.UpdateURI, Configuration["API:UpdateURI"]  } };
+        var parameters = new DialogParameters<EditMachineDialog>()
+{
+{ d => d.FormModel, model },
+{ d => d.UpdateURI,
+Configuration["API:UpdateURI"] }
+};
         var dialog = DialogService.Show<EditMachineDialog>(null, parameters, options);
         var result = await dialog.Result;
     }

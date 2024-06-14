@@ -26,11 +26,11 @@
                     <MudText><strong>Last Updated Machine</strong></MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText class="ma-2"><strong>ID</strong></MudText>
-                    <MudText class="ma-2">@Stats.LastUpdated!.Id</MudText>
-                    <MudText class="ma-2"><strong>Name</strong></MudText>
-                    <MudText class="ma-2">@Stats.LastUpdated!.Name</MudText>
-                </MudCardContent>
+                <MudText class="ma-2"><strong>ID</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated!.Id</MudText>
+                <MudText class="ma-2"><strong>Name</strong></MudText>
+                <MudText class="ma-2">@Stats.LastUpdated!.Name</MudText>
+            </MudCardContent>
             }
             else
             {
@@ -47,11 +47,15 @@
     </MudPaper>
 </MudContainer>
 
-@code {
+@code
+{
+
+    [CascadingParameter]
+    public MachinesView? MachinesView { get; set; }
 
     [Parameter]
     public ApiState ApiState { get; set; }
-    
+
     public MachineStatsModel? Stats { get; set; }
 
     protected override async Task OnInitializedAsync()

@@ -8,3 +8,6 @@ dotnet_diagnostic.CS8602.severity = none
 # RZ100112: TBD
 [{*.razor}]
 dotnet_diagnostic.RZ10012.severity = none
+# Namespace does not match folder structure (IDE0130)
+[*.{cs,vb}]
+dotnet_diagnostic.IDE0130.severity = none

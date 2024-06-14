@@ -1,4 +1,4 @@
-using MachinePark.API.Extensions;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -7,11 +7,24 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.RegisterApplicationServices(builder.Configuration);
+    builder.WebHost.ConfigureKestrel(k =>
+    {
+        k.ListenLocalhost(6000, c => c.Protocols = HttpProtocols.Http2);
+        k.ListenLocalhost(5000, c => c.Protocols = HttpProtocols.Http1AndHttp2);
+    });
+
+    builder.AddHandlerServer();
+
+    builder.Services.RegisterServices(builder.Configuration);
 
     var app = builder.Build();
 
-    await app.ConfigureWebApplication();
+    app.MapHandlers(h =>
+    {
+        h.RegisterEventHub<MachineDataUpdated>();
+    });
+
+    await app.ConfigurebApplication();
 
     await app.RunAsync();
 
