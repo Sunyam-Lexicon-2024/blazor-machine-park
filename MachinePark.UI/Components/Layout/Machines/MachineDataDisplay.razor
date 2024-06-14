@@ -1,5 +1,8 @@
+@using MachinePark.UI.EventHanders
+
 @inject HttpClient ApiClient
 @inject IDialogService DialogService
+@inject OnMachineDataUpdated machineDataUpdated
 
 <MudContainer Class="d-flex flex-column mb-5" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MudElement HtmlTag="div" Class="mb-5 d-flex align-center ">
@@ -29,6 +32,10 @@
     [Parameter]
     public EventCallback DataUpdated { get; set; }
 
+    protected override void OnInitialized() {
+        machineDataUpdated.OnChange += StateHasChanged;
+    }
+
     private async Task OnDataUpdated()
     {
         await DataUpdated.InvokeAsync();
@@ -39,4 +46,13 @@
         ServerDataMode = !ServerDataMode;
     }
 
-}
+}    using MachinePark.UI.EventHanders;
+
+#line default
+#line hidden
+#nullable disable
+    using MachinePark.Core.Events;
+
+#line default
+#line hidden
+#nullable disable

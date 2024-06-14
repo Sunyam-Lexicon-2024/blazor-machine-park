@@ -7,9 +7,14 @@ internal class OnMachineDataUpdated(ILogger<OnMachineDataUpdated> logger) : IEve
 {
     private readonly ILogger<OnMachineDataUpdated> _logger = logger;
 
+    public event Action OnChange;
+
     public Task HandleAsync(MachineDataUpdated eventModel, CancellationToken ct)
     {
         _logger.LogInformation("{number} - {description}", eventModel.Id, eventModel.Description);
+        NotifyDataUpdated();
         return Task.CompletedTask;
     }
+
+    private void NotifyDataUpdated() => OnChange?.Invoke();
 }
