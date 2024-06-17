@@ -3,7 +3,7 @@ namespace Machines.UpdateMachine;
 
 public class Request
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public bool Online { get; set; }
     public double Wattage { get; set; }
@@ -14,5 +14,5 @@ public class Request
 
 public class Response
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 }

@@ -4,7 +4,7 @@
 
 <h3 Class="ma-2">Client Data</h3>
 <MudDivider />
-<MudDataGrid T="MachineModel" Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container"
+<MudDataGrid T="MachineModel" Items="@Machines" Hover="true" ColumnResizeMode="@ResizeMode.Container" HorizontalScrollbar="true"
     DragDropColumnReordering="true" RowsPerPage="5" ShowMenuIcon="true" Filterable="true" QuickFilter="@QuickFilter">
     <ToolBarContent>
         <CascadingValue Value="@SearchTerm">
