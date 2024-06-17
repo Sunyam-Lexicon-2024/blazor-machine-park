@@ -5,3 +5,5 @@ obj/
 # VS Code
 .vscode/
 
+# Misc
+.DS_Store

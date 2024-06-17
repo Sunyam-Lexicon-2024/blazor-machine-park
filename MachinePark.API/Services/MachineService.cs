@@ -42,10 +42,10 @@ public interface IMachineService
 {
     Task<IEnumerable<Machine>> GetAllMachinesAsync();
     Task<IEnumerable<Machine>> GetAllMachinesAsync(QueryParams queryParams);
-    Task<Machine?> GetByIdAsync(int machineId);
+    Task<Machine?> GetByIdAsync(Guid machineId);
     Task<Machine?> AddAsync(Machine machine);
     Task<Machine?> UpdateAsync(Machine machine);
-    Task<Machine?> DeleteAsync(int machineId);
+    Task<Machine?> DeleteAsync(Guid machineId);
     int GetDataSetCount(int? dataSetSizeLimit);
 
     Task<bool> AnyAsync(Expression<Func<Machine, bool>> expression);
@@ -92,7 +92,7 @@ sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return await machines.ToListAsync();
     }
 
-    public async Task<Machine?> GetByIdAsync(int machineId)
+    public async Task<Machine?> GetByIdAsync(Guid machineId)
     {
         return await _machineParkDbContext.Machines.FirstOrDefaultAsync(m => m.Id == machineId);
     }
@@ -108,7 +108,7 @@ sealed class MachineService(MachineParkDbContext machineParkDbContext) : IMachin
         return updatedMachine;
     }
 
-    public async Task<Machine?> DeleteAsync(int machineId)
+    public async Task<Machine?> DeleteAsync(Guid machineId)
     {
         var machineToDelete = await GetByIdAsync(machineId);
         if (machineToDelete is null)

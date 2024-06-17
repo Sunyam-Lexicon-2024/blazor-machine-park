@@ -2,8 +2,8 @@ namespace MachinePark.Core.Entities;
 
 public class Machine
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public required string Name { get; set; }
     public bool Online { get; set; } = true;
     public double Wattage { get; set; } = 10;
     public int Section { get; set; } = 1;

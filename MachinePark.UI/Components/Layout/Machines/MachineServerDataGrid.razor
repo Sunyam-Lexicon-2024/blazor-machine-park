@@ -4,7 +4,7 @@
 
 <h3 Class="ma-2">Server Data</h3>
 <MudDivider />
-<MudDataGrid @ref="DataGrid" T="MachineModel" ServerData="LoadData" Hover="true"
+<MudDataGrid @ref="DataGrid" T="MachineModel" ServerData="LoadData" Hover="true" HorizontalScrollbar="true"
     ColumnResizeMode="@ResizeMode.Container" DragDropColumnReordering="true" RowsPerPage="5" ShowMenuIcon="true">
     <ToolBarContent>
         <CascadingValue Value="@SearchTerm">
@@ -63,7 +63,7 @@
 
     private int _dataSetSize = 100;
     private string? _getAllURI;
-    private string SortInfo = string.Empty;
+    private string? SortInfo = string.Empty;
 
     [CascadingParameter]
     public MachinesView? MachinesView { get; set; }
